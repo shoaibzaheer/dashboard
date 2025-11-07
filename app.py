@@ -55,7 +55,23 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar navigation
+# Sidebar with Kee Platform Logo
+try:
+    # Try to load the KEE logo image
+    st.sidebar.image("/Users/shoaibzahir/Downloads/KEELogo.7a757631.svg", width=200)
+except:
+    # Fallback to styled text logo if image not found
+    st.sidebar.markdown("""
+    <div style='text-align: center; padding: 20px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-bottom: 20px;'>
+        <h1 style='color: white; margin: 0; font-size: 2.5rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
+            KEE
+        </h1>
+        <p style='color: #f0f0f0; margin: 5px 0 0 0; font-size: 0.9rem; letter-spacing: 2px;'>PLATFORM</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.sidebar.markdown("---")
+
 st.sidebar.title("🎯 Model Journey Navigation")
 stage = st.sidebar.radio(
     "Select Stage",
@@ -75,6 +91,31 @@ def create_journey_flow():
     """Create a visual journey flow using Streamlit columns instead of plotly"""
     # This function now returns None and we'll use Streamlit columns directly
     return None
+
+# Kee Platform Header with Logo
+col1, col2 = st.columns([3, 1])
+with col1:
+    try:
+        # Try to load the KEE logo image
+        st.image("assets/kee_logo.svg", width=180)
+    except:
+        # Fallback to styled text header if image not found
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>
+            <h1 style='color: white; margin: 0; font-size: 2rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
+                KEE PLATFORM
+            </h1>
+            <p style='color: #f0f0f0; margin: 5px 0 0 0; font-size: 0.9rem;'>Advanced Credit Risk Analytics</p>
+        </div>
+        """, unsafe_allow_html=True)
+with col2:
+    st.markdown("""
+    <div style='text-align: right; padding-top: 20px;'>
+        <p style='color: #667eea; margin: 0; font-size: 0.85rem; font-weight: bold;'>Powered by AI & ML</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # Main content based on selected stage
 if stage == "🏠 Overview":
@@ -1434,12 +1475,22 @@ elif stage == "📈 6. Dashboards & Personas":
         
         # st.dataframe(decisions_data, use_container_width=True, hide_index=True)
 
-# Footer
+# Footer with Kee Platform Branding
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: #666; padding: 20px;'>
-    <p><strong>Credit Risk Model Journey</strong> | Built with Streamlit | © 2024 Kee Platforms</p>
-    
+<div style='text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-top: 40px;'>
+    <h2 style='color: white; margin: 0 0 10px 0; font-size: 2rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
+        KEE PLATFORM
+    </h2>
+    <p style='color: #f0f0f0; margin: 10px 0; font-size: 1.1rem;'>
+        <strong>Credit Risk Model Journey</strong> | End-to-End ML Pipeline
+    </p>
+    <p style='color: #e0e0e0; margin: 5px 0; font-size: 0.9rem;'>
+        Built with Streamlit | Powered by Advanced Analytics
+    </p>
+    <p style='color: #d0d0d0; margin: 15px 0 0 0; font-size: 0.85rem;'>
+        © 2024 Kee Platform. All rights reserved.
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
