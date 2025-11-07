@@ -79,25 +79,25 @@ def create_journey_flow():
         "Dashboards &<br>Serving"
     ]
     
-    # Create flow diagram
-    x_positions = [0, 1, 2, 3, 4, 5]
+    # Create flow diagram with better spacing
+    x_positions = [0, 1.5, 3, 4.5, 6, 7.5]
     y_positions = [0, 0, 0, 0, 0, 0]
     
-    # Add nodes
+    # Add nodes with larger size and better text visibility
     for i, (x, y, stage) in enumerate(zip(x_positions, y_positions, stages)):
         fig.add_trace(go.Scatter(
             x=[x], y=[y],
             mode='markers+text',
-            marker=dict(size=80, color='#1f77b4', line=dict(width=2, color='white')),
+            marker=dict(size=120, color='#1f77b4', line=dict(width=3, color='white')),
             text=stage,
             textposition='middle center',
-            textfont=dict(size=10, color='white', family='Arial Black'),
+            textfont=dict(size=11, color='white', family='Arial Black'),
             hoverinfo='text',
             hovertext=f"Stage {i+1}: {stage.replace('<br>', ' ')}",
             showlegend=False
         ))
     
-    # Add arrows
+    # Add arrows between nodes
     for i in range(len(x_positions) - 1):
         fig.add_annotation(
             x=x_positions[i+1], y=y_positions[i+1],
@@ -114,9 +114,9 @@ def create_journey_flow():
     fig.update_layout(
         title="Credit Risk Model Journey",
         showlegend=False,
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        height=200,
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.5, 8]),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.5, 0.5]),
+        height=250,
         margin=dict(l=20, r=20, t=40, b=20),
         plot_bgcolor='white'
     )
@@ -1448,8 +1448,8 @@ elif stage == "📈 6. Dashboards & Personas":
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 20px;'>
-    <p><strong>Credit Risk Model Journey</strong> |  © 2025 Kee Platforms</p>
-    
+    <p><strong>Credit Risk Model Journey</strong> | Built with Streamlit | © 2024 Conektr</p>
+    <p>For questions or support, contact: data-science@conektr.com</p>
 </div>
 """, unsafe_allow_html=True)
 
