@@ -1448,8 +1448,8 @@ elif stage == "📈 6. Dashboards & Personas":
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 20px;'>
-    <p><strong>Credit Risk Model Journey</strong> | Built with Streamlit | © 2024 Conektr</p>
-    <p>For questions or support, contact: data-science@conektr.com</p>
+    <p><strong>Credit Risk Model Journey</strong> |  © 2025 Kee Platforms</p>
+    
 </div>
 """, unsafe_allow_html=True)
 
