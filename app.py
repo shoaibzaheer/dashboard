@@ -214,16 +214,16 @@ elif stage == "📥 1. Data Ingestion":
         }
         st.dataframe(pd.DataFrame(sources_data), use_container_width=True, hide_index=True)
     
-    with col2:
-        # Data source pie chart
-        fig = go.Figure(data=[go.Pie(
-            labels=["Conektr", "MasterCard", "Bank", "AECB"],
-            values=[4525, 4525, 3200, 4100],
-            hole=0.4,
-            marker_colors=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
-        )])
-        fig.update_layout(title="Data Source Coverage", height=300)
-        st.plotly_chart(fig, use_container_width=True)
+    # with col2:
+    #     # Data source pie chart
+    #     fig = go.Figure(data=[go.Pie(
+    #         labels=["Conektr", "MasterCard", "Bank", "AECB"],
+    #         values=[4525, 4525, 3200, 4100],
+    #         hole=0.4,
+    #         marker_colors=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+    #     )])
+    #     fig.update_layout(title="Data Source Coverage", height=300)
+    #     st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("---")
     
