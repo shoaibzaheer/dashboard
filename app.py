@@ -10,6 +10,10 @@ import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
 import json
+import numpy as np
+from credit_officer_enhanced_section import render_credit_officer_dashboard
+import numpy as np
+
 
 # Page configuration
 st.set_page_config(
@@ -830,7 +834,7 @@ elif stage == "🤖 4. Model Training":
         
         fig = px.bar(coef_data, x="Coefficient", y="Feature", orientation='h',
                      title="Model Coefficients", color="Coefficient",
-                     color_continuous_scale="RdYlGn_r")
+                     color_continuous_scale="RdYlGn")
         fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
     
@@ -1192,7 +1196,7 @@ elif stage == "📈 6. Dashboards & Personas":
             })
             fig = px.pie(risk_dist, values="Count", names="Risk Category", 
                          title="Portfolio Risk Distribution",
-                         color_discrete_sequence=px.colors.sequential.RdYlGn_r)
+                         color_discrete_sequence=['#2ca02c', '#90ee90', '#ffc107', '#ff7f0e', '#dc3545'])
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
@@ -1357,99 +1361,100 @@ elif stage == "📈 6. Dashboards & Personas":
         st.dataframe(alerts_data, use_container_width=True, hide_index=True)
     
     elif dashboard_type == "💼 Credit Officer Dashboard":
-        st.markdown("### 💼 Credit Officer Dashboard")
-        st.markdown("*Credit decision support and customer assessment for credit officers*")
+        # st.markdown("### 💼 Credit Officer Dashboard")
+        # st.markdown("*Credit decision support and customer assessment for credit officers*")
         
+        render_credit_officer_dashboard()
         # Quick stats
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Pending Applications", "23")
-        with col2:
-            st.metric("Approved Today", "15")
-        with col3:
-            st.metric("Rejected Today", "3")
-        with col4:
-            st.metric("Avg Processing Time", "12 min")
+        # col1, col2, col3, col4 = st.columns(4)
+        # with col1:
+        #     st.metric("Pending Applications", "23")
+        # with col2:
+        #     st.metric("Approved Today", "15")
+        # with col3:
+        #     st.metric("Rejected Today", "3")
+        # with col4:
+        #     st.metric("Avg Processing Time", "12 min")
         
-        st.markdown("---")
+        # st.markdown("---")
         
-        # Credit assessment tool
-        st.markdown("#### 🎯 Credit Assessment Tool")
+        # # Credit assessment tool
+        # st.markdown("#### 🎯 Credit Assessment Tool")
         
-        col1, col2 = st.columns(2)
+        # col1, col2 = st.columns(2)
         
-        with col1:
-            customer_id_input = st.text_input("Customer ID", "12345")
-            requested_limit = st.number_input("Requested Credit Limit (AED)", value=50000, step=5000)
+        # with col1:
+        #     customer_id_input = st.text_input("Customer ID", "12345")
+        #     requested_limit = st.number_input("Requested Credit Limit (AED)", value=50000, step=5000)
         
-        with col2:
-            tenure_months = st.number_input("Tenure (Months)", value=12, step=1)
-            interest_rate = st.number_input("Interest Rate (%)", value=8.5, step=0.5)
+        # with col2:
+        #     tenure_months = st.number_input("Tenure (Months)", value=12, step=1)
+        #     interest_rate = st.number_input("Interest Rate (%)", value=8.5, step=0.5)
         
-        if st.button("Assess Credit Application", type="primary"):
-            st.success("✅ Credit Assessment Complete!")
+        # if st.button("Assess Credit Application", type="primary"):
+        #     st.success("✅ Credit Assessment Complete!")
             
-            # Assessment results
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Risk Score", "0.000123", help="Very Low Risk")
-            with col2:
-                st.metric("Recommended Limit", "AED 75,000", "+AED 25K")
-            with col3:
-                st.metric("Approval Confidence", "98.5%")
+        #     # Assessment results
+        #     col1, col2, col3 = st.columns(3)
+        #     with col1:
+        #         st.metric("Risk Score", "0.000123", help="Very Low Risk")
+        #     with col2:
+        #         st.metric("Recommended Limit", "AED 75,000", "+AED 25K")
+        #     with col3:
+        #         st.metric("Approval Confidence", "98.5%")
             
-            # Recommendation
-            st.markdown("#### 💡 Recommendation")
-            st.success("""
-            **APPROVE** - Customer qualifies for credit
+        #     # Recommendation
+        #     st.markdown("#### 💡 Recommendation")
+        #     st.success("""
+        #     **APPROVE** - Customer qualifies for credit
             
-            **Rationale**:
-            - ✅ Very Low Risk (0.000123 probability)
-            - ✅ Strong payment history
-            - ✅ Stable income and cash flow
-            - ✅ Low volatility (0.25)
-            - ✅ Positive growth trend (+12.3%)
-            - ✅ Recent activity (5 days ago)
+        #     **Rationale**:
+        #     - ✅ Very Low Risk (0.000123 probability)
+        #     - ✅ Strong payment history
+        #     - ✅ Stable income and cash flow
+        #     - ✅ Low volatility (0.25)
+        #     - ✅ Positive growth trend (+12.3%)
+        #     - ✅ Recent activity (5 days ago)
             
-            **Suggested Terms**:
-            - Credit Limit: AED 75,000 (higher than requested)
-            - Interest Rate: 7.5% (preferential rate)
-            - Tenure: 12-24 months
-            - Collateral: Not required
-            """)
+        #     **Suggested Terms**:
+        #     - Credit Limit: AED 75,000 (higher than requested)
+        #     - Interest Rate: 7.5% (preferential rate)
+        #     - Tenure: 12-24 months
+        #     - Collateral: Not required
+        #     """)
             
-            # SHAP explanation
-            st.markdown("#### 🔍 Decision Explanation (SHAP)")
+        #     # SHAP explanation
+        #     st.markdown("#### 🔍 Decision Explanation (SHAP)")
             
-            shap_data = pd.DataFrame({
-                "Feature": ["volatility", "recency", "gmv_slope", "sales_12m", "consistency_score"],
-                "Value": [0.25, 5, 1234.5, 136282, 0.75],
-                "SHAP Contribution": [-0.002, -0.0015, -0.001, -0.0008, -0.0006],
-                "Impact": ["↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk"]
-            })
+        #     shap_data = pd.DataFrame({
+        #         "Feature": ["volatility", "recency", "gmv_slope", "sales_12m", "consistency_score"],
+        #         "Value": [0.25, 5, 1234.5, 136282, 0.75],
+        #         "SHAP Contribution": [-0.002, -0.0015, -0.001, -0.0008, -0.0006],
+        #         "Impact": ["↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk"]
+        #     })
             
-            st.dataframe(shap_data, use_container_width=True, hide_index=True)
+        #     st.dataframe(shap_data, use_container_width=True, hide_index=True)
         
-        # Recent decisions
-        st.markdown("---")
-        st.markdown("#### 📋 Recent Credit Decisions")
+        # # Recent decisions
+        # st.markdown("---")
+        # st.markdown("#### 📋 Recent Credit Decisions")
         
-        decisions_data = pd.DataFrame({
-            "Customer ID": ["8697", "5432", "9876", "3456", "7890"],
-            "Requested": ["50K", "30K", "100K", "25K", "75K"],
-            "Approved": ["75K", "30K", "Rejected", "25K", "60K"],
-            "Decision": ["Approved", "Approved", "Rejected", "Approved", "Approved"],
-            "Date": ["2024-11-06", "2024-11-06", "2024-11-05", "2024-11-05", "2024-11-04"]
-        })
+        # decisions_data = pd.DataFrame({
+        #     "Customer ID": ["8697", "5432", "9876", "3456", "7890"],
+        #     "Requested": ["50K", "30K", "100K", "25K", "75K"],
+        #     "Approved": ["75K", "30K", "Rejected", "25K", "60K"],
+        #     "Decision": ["Approved", "Approved", "Rejected", "Approved", "Approved"],
+        #     "Date": ["2024-11-06", "2024-11-06", "2024-11-05", "2024-11-05", "2024-11-04"]
+        # })
         
-        st.dataframe(decisions_data, use_container_width=True, hide_index=True)
+        # st.dataframe(decisions_data, use_container_width=True, hide_index=True)
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 20px;'>
-    <p><strong>Credit Risk Model Journey</strong> | Built with Streamlit | © 2024 Conektr</p>
-    <p>For questions or support, contact: data-science@conektr.com</p>
+    <p><strong>Credit Risk Model Journey</strong> | © 2024 Kee Platforms</p>
+    
 </div>
 """, unsafe_allow_html=True)
 
