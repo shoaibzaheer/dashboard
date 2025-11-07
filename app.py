@@ -72,68 +72,53 @@ stage = st.sidebar.radio(
 
 # Helper function to create journey flow diagram
 def create_journey_flow():
-    fig = go.Figure()
-    
-    stages = [
-        "Data<br>Ingestion",
-        "EDA &<br>Profiling",
-        "Feature<br>Engineering",
-        "Model<br>Training",
-        "Model<br>Deployment",
-        "Dashboards &<br>Serving"
-    ]
-    
-    # Create flow diagram with better spacing
-    x_positions = [0, 1.5, 3, 4.5, 6, 7.5]
-    y_positions = [0, 0, 0, 0, 0, 0]
-    
-    # Add nodes with larger size and better text visibility
-    for i, (x, y, stage) in enumerate(zip(x_positions, y_positions, stages)):
-        fig.add_trace(go.Scatter(
-            x=[x], y=[y],
-            mode='markers+text',
-            marker=dict(size=120, color='#1f77b4', line=dict(width=3, color='white')),
-            text=stage,
-            textposition='middle center',
-            textfont=dict(size=11, color='white', family='Arial Black'),
-            hoverinfo='text',
-            hovertext=f"Stage {i+1}: {stage.replace('<br>', ' ')}",
-            showlegend=False
-        ))
-    
-    # Add arrows between nodes
-    for i in range(len(x_positions) - 1):
-        fig.add_annotation(
-            x=x_positions[i+1], y=y_positions[i+1],
-            ax=x_positions[i], ay=y_positions[i],
-            xref='x', yref='y',
-            axref='x', ayref='y',
-            showarrow=True,
-            arrowhead=2,
-            arrowsize=1.5,
-            arrowwidth=3,
-            arrowcolor='#1f77b4'
-        )
-    
-    fig.update_layout(
-        title="Credit Risk Model Journey",
-        showlegend=False,
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.5, 8]),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.5, 0.5]),
-        height=250,
-        margin=dict(l=20, r=20, t=40, b=20),
-        plot_bgcolor='white'
-    )
-    
-    return fig
+    """Create a visual journey flow using Streamlit columns instead of plotly"""
+    # This function now returns None and we'll use Streamlit columns directly
+    return None
 
 # Main content based on selected stage
 if stage == "🏠 Overview":
     st.markdown('<div class="main-header">🎯 Credit Risk Model Journey</div>', unsafe_allow_html=True)
     st.markdown("### End-to-End ML Pipeline for Credit Risk Assessment")
     
-    # Journey flow diagram
-    st.plotly_chart(create_journey_flow(), use_container_width=True)
+    # Journey flow diagram - Card-based visual
+    st.markdown("#### 🔄 ML Pipeline Journey")
+    
+    # Create 6 columns for the journey stages
+    cols = st.columns(6)
+    
+    stages = [
+        ("📥", "Data\nIngestion", "#e3f2fd"),
+        ("📊", "EDA &\nProfiling", "#f3e5f5"),
+        ("🔧", "Feature\nEngineering", "#e8f5e9"),
+        ("🤖", "Model\nTraining", "#fff3e0"),
+        ("🚀", "Model\nDeployment", "#fce4ec"),
+        ("📈", "Dashboards\n& Serving", "#e0f2f1")
+    ]
+    
+    for i, (col, (icon, name, color)) in enumerate(zip(cols, stages)):
+        with col:
+            st.markdown(f"""
+            <div style='
+                background-color: {color};
+                padding: 20px 10px;
+                border-radius: 10px;
+                text-align: center;
+                border: 2px solid #1f77b4;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            '>
+                <div style='font-size: 32px; margin-bottom: 8px;'>{icon}</div>
+                <div style='font-size: 13px; font-weight: bold; color: #333; line-height: 1.3;'>{name}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add arrow except for last column
+            if i < 5:
+                st.markdown("<div style='text-align: center; font-size: 24px; color: #1f77b4; margin-top: -10px;'>→</div>", unsafe_allow_html=True)
     
     # Overview metrics
     col1, col2, col3, col4 = st.columns(4)
@@ -1453,7 +1438,7 @@ elif stage == "📈 6. Dashboards & Personas":
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 20px;'>
-    <p><strong>Credit Risk Model Journey</strong> | © 2024 Kee Platforms</p>
+    <p><strong>Credit Risk Model Journey</strong> | Built with Streamlit | © 2024 Kee Platforms</p>
     
 </div>
 """, unsafe_allow_html=True)
