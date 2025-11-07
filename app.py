@@ -748,9 +748,6 @@ elif stage == "🤖 4. Model Training":
     
     with tab1:
         # Confusion matrix
-        from sklearn.metrics import confusion_matrix
-        import numpy as np
-        
         cm = np.array([[850, 45], [35, 3595]])
         
         fig = go.Figure(data=go.Heatmap(
