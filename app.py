@@ -139,7 +139,7 @@ if stage == "🏠 Overview":
     # Overview metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Data Sources", "4", help="Conektr, MasterCard, Bank, AECB")
+        st.metric("Data Sources", "4", help="Distribution Partner, Payment Partner, Bank, AECB")
     with col2:
         st.metric("Total Records", "4,525", help="Unique customers analyzed")
     with col3:
@@ -208,7 +208,7 @@ elif stage == "📥 1. Data Ingestion":
     
     with col1:
         sources_data = {
-            "Source": ["Conektr Data", "MasterCard RSPI", "Bank Transactions", "AECB Data"],
+            "Source": ["Distribution Partner Data", "Payment Partner", "Bank Transactions", "AECB Data"],
             "Records": ["4,525", "4,525", "3,200", "4,100"],
             "Status": ["✅", "✅", "✅", "✅"]
         }
@@ -217,7 +217,7 @@ elif stage == "📥 1. Data Ingestion":
     # with col2:
     #     # Data source pie chart
     #     fig = go.Figure(data=[go.Pie(
-    #         labels=["Conektr", "MasterCard", "Bank", "AECB"],
+    #         labels=["Distribution Partner", "Payment Partner", "Bank", "AECB"],
     #         values=[4525, 4525, 3200, 4100],
     #         hole=0.4,
     #         marker_colors=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
@@ -230,10 +230,10 @@ elif stage == "📥 1. Data Ingestion":
     # Detailed data source information
     st.markdown("#### 📋 Data Source Details")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["🏢 Conektr Data", "💳 MasterCard RSPI", "🏦 Bank Transactions", "📊 AECB Data"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🏢 Distribution Partner Data", "💳 Payment Partner RSPI", "🏦 Bank Transactions", "📊 AECB Data"])
     
     with tab1:
-        st.markdown("**Conektr Transactional Data**")
+        st.markdown("**Distribution Partner Transactional Data**")
         st.markdown("""
         - **Source**: Internal transaction database
         - **Records**: 4,525 unique customers
@@ -255,9 +255,9 @@ elif stage == "📥 1. Data Ingestion":
         st.dataframe(pd.DataFrame(conektr_metrics), use_container_width=True, hide_index=True)
     
     with tab2:
-        st.markdown("**MasterCard RSPI (Risk Score & Payment Intelligence)**")
+        st.markdown("**Payment Partner (Risk Score & Payment Intelligence)**")
         st.markdown("""
-        - **Source**: MasterCard API integration
+        - **Source**: Payment Partner API integration
         - **Records**: 4,525 customers (matched)
         - **Key Fields**:
           - Payment behavior scores
@@ -266,7 +266,7 @@ elif stage == "📥 1. Data Ingestion":
           - Spending patterns
           - Credit utilization metrics
         - **Update Frequency**: Weekly
-        - **Match Rate**: 100% (all Conektr customers matched)
+        - **Match Rate**: 100% (all Distribution Partner customers matched)
         """)
         
         mc_metrics = {
