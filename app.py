@@ -760,11 +760,11 @@ elif stage == "📥 1. Data Ingestion":
         - **Data Quality**: 99.8% complete
         """)
         
-        conektr_metrics = {
-            "Metric": ["Total Customers", "Total Orders", "Total GMV", "Avg Orders/Customer", "Data Completeness"],
-            "Value": ["4,525", "125,430", "AED 58.4M", "27.7", "99.8%"]
-        }
-        st.dataframe(pd.DataFrame(conektr_metrics), use_container_width=True, hide_index=True)
+        # conektr_metrics = {
+        #     "Metric": ["Total Customers", "Total Orders", "Total GMV", "Avg Orders/Customer", "Data Completeness"],
+        #     "Value": ["4,525", "125,430", "AED 58.4M", "27.7", "99.8%"]
+        # }
+        # st.dataframe(pd.DataFrame(conektr_metrics), use_container_width=True, hide_index=True)
     
     with tab2:
         st.markdown("**Payment Partner (Kee Score & Payment Intelligence)**")
@@ -781,11 +781,11 @@ elif stage == "📥 1. Data Ingestion":
         - **Match Rate**: 100% (all Distribution Partner customers matched)
         """)
         
-        mc_metrics = {
-            "Metric": ["Matched Customers", "Avg Kee Score", "High Risk %", "Medium Risk %", "Low Risk %"],
-            "Value": ["4,525", "72.3/100", "8.2%", "23.5%", "68.3%"]
-        }
-        st.dataframe(pd.DataFrame(mc_metrics), use_container_width=True, hide_index=True)
+        # mc_metrics = {
+        #     "Metric": ["Matched Customers", "Avg Kee Score", "High Risk %", "Medium Risk %", "Low Risk %"],
+        #     "Value": ["4,525", "72.3/100", "8.2%", "23.5%", "68.3%"]
+        # }
+        # st.dataframe(pd.DataFrame(mc_metrics), use_container_width=True, hide_index=True)
     
     with tab3:
         st.markdown("**Bank Transaction Data**")
@@ -803,11 +803,11 @@ elif stage == "📥 1. Data Ingestion":
         - **Data Quality**: 95.2% complete
         """)
         
-        bank_metrics = {
-            "Metric": ["Customers with Data", "Avg Monthly Balance", "Avg Monthly Income", "Bounce Rate", "Coverage"],
-            "Value": ["3,200", "AED 45,230", "AED 12,450", "2.3%", "70.7%"]
-        }
-        st.dataframe(pd.DataFrame(bank_metrics), use_container_width=True, hide_index=True)
+        # bank_metrics = {
+        #     "Metric": ["Customers with Data", "Avg Monthly Balance", "Avg Monthly Income", "Bounce Rate", "Coverage"],
+        #     "Value": ["3,200", "AED 45,230", "AED 12,450", "2.3%", "70.7%"]
+        # }
+        # st.dataframe(pd.DataFrame(bank_metrics), use_container_width=True, hide_index=True)
     
     with tab4:
         st.markdown("**AECB (Al Etihad Credit Bureau) Data**")
@@ -825,11 +825,11 @@ elif stage == "📥 1. Data Ingestion":
         - **Match Rate**: 90.6%
         """)
         
-        aecb_metrics = {
-            "Metric": ["Customers with Data", "Avg Credit Score", "Active Loans %", "Delinquency Rate", "Coverage"],
-            "Value": ["4,100", "685", "45.2%", "5.8%", "90.6%"]
-        }
-        st.dataframe(pd.DataFrame(aecb_metrics), use_container_width=True, hide_index=True)
+        # aecb_metrics = {
+        #     "Metric": ["Customers with Data", "Avg Credit Score", "Active Loans %", "Delinquency Rate", "Coverage"],
+        #     "Value": ["4,100", "685", "45.2%", "5.8%", "90.6%"]
+        # }
+        # st.dataframe(pd.DataFrame(aecb_metrics), use_container_width=True, hide_index=True)
     
     with tab5:
         st.markdown("**LOS (Loan Origination System) Data**")
@@ -846,11 +846,11 @@ elif stage == "📥 1. Data Ingestion":
         - **Update Frequency**: Real-time
         - **Match Rate**: 92.8% (4,200 out of 4,525 customers)
         """)
-        los_metrics = {
-            "Metric": ["Matched Customers", "Avg Loan Amount", "Approval Rate", "Avg Income", "Employment Rate"],
-            "Value": ["4,200", "AED 125K", "68%", "AED 8,500", "94%"]
-        }
-        st.dataframe(pd.DataFrame(los_metrics), use_container_width=True, hide_index=True)
+        # los_metrics = {
+        #     "Metric": ["Matched Customers", "Avg Loan Amount", "Approval Rate", "Avg Income", "Employment Rate"],
+        #     "Value": ["4,200", "AED 125K", "68%", "AED 8,500", "94%"]
+        # }
+        # st.dataframe(pd.DataFrame(los_metrics), use_container_width=True, hide_index=True)
     
     with tab6:
         st.markdown("**Dewa Bills (Utility Payment History)**")
@@ -867,11 +867,11 @@ elif stage == "📥 1. Data Ingestion":
         - **Update Frequency**: Monthly
         - **Match Rate**: 84.0% (3,800 out of 4,525 customers)
         """)
-        dewa_metrics = {
-            "Metric": ["Matched Customers", "Avg Monthly Bill", "Payment Rate", "Late Payments", "Avg Account Age"],
-            "Value": ["3,800", "AED 285", "96.5%", "2.1%", "4.2 years"]
-        }
-        st.dataframe(pd.DataFrame(dewa_metrics), use_container_width=True, hide_index=True)
+        # dewa_metrics = {
+        #     "Metric": ["Matched Customers", "Avg Monthly Bill", "Payment Rate", "Late Payments", "Avg Account Age"],
+        #     "Value": ["3,800", "AED 285", "96.5%", "2.1%", "4.2 years"]
+        # }
+        # st.dataframe(pd.DataFrame(dewa_metrics), use_container_width=True, hide_index=True)
     
     st.markdown("---")
     
@@ -906,15 +906,15 @@ elif stage == "📥 1. Data Ingestion":
     st.markdown("---")
     st.markdown("#### 📦 Unified Dataset")
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Total Customers", "4,525")
     with col2:
         st.metric("Total Fields", "156")
     with col3:
         st.metric("Data Completeness", "96.8%")
-    with col4:
-        st.metric("Processing Time", "2 hours")
+    # with col4:
+    #     st.metric("Processing Time", "2 hours")
 
 elif stage == "📊 2. EDA & Data Profiling":
     st.markdown('<div class="stage-header">📊 Stage 2: EDA & Data Profiling</div>', unsafe_allow_html=True)
@@ -944,10 +944,14 @@ elif stage == "📊 2. EDA & Data Profiling":
     
     with tab1:
         # GMV distribution
-        import numpy as np
         gmv_data = np.random.lognormal(9, 1.5, 4525)
-        fig = px.histogram(gmv_data, nbins=50, title="Customer GMV Distribution")
-        fig.update_layout(xaxis_title="GMV (AED)", yaxis_title="Number of Customers", height=400)
+        fig = px.histogram(x=gmv_data, nbins=50, title="Customer GMV Distribution")
+        fig.update_layout(
+            xaxis_title="GMV (AED)", 
+            yaxis_title="Number of Customers", 
+            height=400,
+            showlegend=False
+        )
         st.plotly_chart(fig, use_container_width=True)
         
         col1, col2, col3 = st.columns(3)
@@ -1578,25 +1582,25 @@ elif stage == "🚀 5. Model Deployment":
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Deployment Architecture with professional cards
-    st.markdown("#### 🏗️ Deployment Architecture")
+    # st.markdown("#### 🏗️ Deployment Architecture")
     
-    # Architecture layers
-    arch_layers = [
-        ("🌐 Client Layer", "Web Dashboard • Mobile App • Credit Officer Portal", "#e3f2fd", "#2196F3"),
-        ("🔐 API Gateway", "Authentication • Rate Limiting • Load Balancing • Logging", "#fff3e0", "#FF9800"),
-        ("⚡ Serving Layer", "Real-time API (Flask) • Batch Pipeline (Airflow)", "#e8f5e9", "#4CAF50"),
-        ("🤖 Model Layer", "MLflow Registry • Version Control • A/B Testing", "#f3e5f5", "#9C27B0"),
-        ("💾 Data Layer", "Feature Store (Delta Lake) • Caching (Redis)", "#e1f5fe", "#03A9F4"),
-        ("📊 Monitoring", "Prometheus • Grafana • Alerting • Logging", "#fce4ec", "#E91E63")
-    ]
+    # # Architecture layers
+    # arch_layers = [
+    #     ("🌐 Client Layer", "Web Dashboard • Mobile App • Credit Officer Portal", "#e3f2fd", "#2196F3"),
+    #     ("🔐 API Gateway", "Authentication • Rate Limiting • Load Balancing • Logging", "#fff3e0", "#FF9800"),
+    #     ("⚡ Serving Layer", "Real-time API (Flask) • Batch Pipeline (Airflow)", "#e8f5e9", "#4CAF50"),
+    #     ("🤖 Model Layer", "MLflow Registry • Version Control • A/B Testing", "#f3e5f5", "#9C27B0"),
+    #     ("💾 Data Layer", "Feature Store (Delta Lake) • Caching (Redis)", "#e1f5fe", "#03A9F4"),
+    #     ("📊 Monitoring", "Prometheus • Grafana • Alerting • Logging", "#fce4ec", "#E91E63")
+    # ]
     
-    for title, desc, bg_color, border_color in arch_layers:
-        st.markdown(f"""
-        <div style='background: {bg_color}; padding: 15px 20px; border-radius: 8px; border-left: 4px solid {border_color}; margin-bottom: 10px;'>
-            <h4 style='color: {border_color}; margin: 0 0 5px 0; font-size: 1.1rem;'>{title}</h4>
-            <p style='color: #666; margin: 0; font-size: 0.9rem;'>{desc}</p>
-        </div>
-        """, unsafe_allow_html=True)
+    # for title, desc, bg_color, border_color in arch_layers:
+    #     st.markdown(f"""
+    #     <div style='background: {bg_color}; padding: 15px 20px; border-radius: 8px; border-left: 4px solid {border_color}; margin-bottom: 10px;'>
+    #         <h4 style='color: {border_color}; margin: 0 0 5px 0; font-size: 1.1rem;'>{title}</h4>
+    #         <p style='color: #666; margin: 0; font-size: 0.9rem;'>{desc}</p>
+    #     </div>
+    #     """, unsafe_allow_html=True)
     
     st.markdown("---")
     
