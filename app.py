@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Credit Risk Model Journey - Visual UI for Client Presentation
+Kee Credit Risk Model - Visual UI for Client Presentation
 Shows the complete journey from data ingestion to model serving
 """
 
@@ -158,7 +158,7 @@ with st.sidebar:
     st.markdown("""
     <div style='text-align: center; margin-bottom: 20px;'>
         <h3 style='color: #1f77b4; margin: 0; font-size: 1.1rem; font-weight: 600;'>
-            Credit Risk Model Journey
+            Kee Credit Risk Model
         </h3>
         <p style='color: #666; margin: 5px 0 0 0; font-size: 0.75rem;'>
             End-to-End ML Pipeline
@@ -609,7 +609,7 @@ def create_journey_flow():
 
 # Main content based on selected stage
 if stage == "🏠 Overview":
-    st.markdown('<div class="main-header">🎯 Credit Risk Model Journey</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🎯 Kee Credit Risk Model</div>', unsafe_allow_html=True)
     st.markdown("### End-to-End ML Pipeline for Credit Risk Assessment")
     
     # Journey flow diagram - Card-based visual
@@ -2478,7 +2478,7 @@ with col2:
     # st.markdown("""
     # <div style='text-align: center;'>
     #     <p style='color: #f0f0f0; margin: 5px 0; font-size: 0.95rem;'>
-    #         <strong>Credit Risk Model Journey</strong> | End-to-End ML Pipeline
+    #         <strong>Kee Credit Risk Model</strong> | End-to-End ML Pipeline
     #     </p>
     #     <p style='color: #e0e0e0; margin: 3px 0; font-size: 0.8rem;'>
     #         Built with Streamlit | Powered by Advanced Analytics
