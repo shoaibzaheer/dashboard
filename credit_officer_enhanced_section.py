@@ -87,7 +87,7 @@ def render_credit_officer_dashboard():
     
     # Create tabs for different data sources
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 Conektr Data",
+        "📊 Distribution Partner Data",
         "🎯 Risk Profile",
         "🏦 Bank Statements",
         "📈 AECB Score",
@@ -98,7 +98,7 @@ def render_credit_officer_dashboard():
     
     # TAB 1: Conektr Transaction Data
     with tab1:
-        st.markdown("#### 📊 Conektr Transaction Data")
+        st.markdown("#### 📊 Distribution Partner Transaction Data")
         st.markdown("*Transaction history and business performance metrics*")
         
         # Key metrics
@@ -167,10 +167,10 @@ def render_credit_officer_dashboard():
         st.markdown("#### 🎯 Customer Risk Profile & SHAP Analysis")
         st.markdown("*ML model risk assessment with detailed feature explanations*")
         
-        # Risk score display
+        # Kee score display
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Risk Score", "0.000123", help="Probability of default")
+            st.metric("Kee Score", "0.000123", help="Probability of default")
         with col2:
             risk_category = "Very Low Risk"
             st.markdown(f"**Risk Category**")
@@ -181,7 +181,7 @@ def render_credit_officer_dashboard():
         st.markdown("---")
         
         # SHAP Feature Analysis
-        st.markdown("**🔍 SHAP Feature Analysis - Why This Risk Score?**")
+        st.markdown("**🔍 SHAP Feature Analysis - Why This Kee Score?**")
         st.markdown("*Each feature's contribution to the risk prediction*")
         
         shap_data = pd.DataFrame({
@@ -233,7 +233,7 @@ def render_credit_officer_dashboard():
         ))
         fig.update_layout(
             title="SHAP Feature Contributions (Waterfall)",
-            xaxis_title="Impact on Risk Score",
+            xaxis_title="Impact on Kee Score",
             height=400
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -687,7 +687,7 @@ def render_credit_officer_dashboard():
     ### ✅ RECOMMENDED: APPROVE
     
     **Rationale:**
-    - ✅ Very Low Risk Score (0.000123 probability of default)
+    - ✅ Very Low Kee Score (0.000123 probability of default)
     - ✅ Excellent payment history across all sources
     - ✅ Stable income and employment (4 years)
     - ✅ Strong cash flow and savings behavior
@@ -825,7 +825,7 @@ def render_credit_officer_dashboard():
         "Approved": ["AED 75,000", "AED 30,000", "Rejected", "AED 25,000", "AED 60,000"],
         "Decision": ["✅ Approved", "✅ Approved", "❌ Rejected", "✅ Approved", "✅ Approved"],
         "Officer": ["You", "You", "You", "Sarah M.", "Ahmed K."],
-        "Risk Score": ["0.000123", "0.002", "0.085", "0.001", "0.003"]
+        "Kee Score": ["0.000123", "0.002", "0.085", "0.001", "0.003"]
     })
     
     st.dataframe(decisions_data, use_container_width=True, hide_index=True)
