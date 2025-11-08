@@ -12,8 +12,21 @@ from datetime import datetime
 import json
 import numpy as np
 from credit_officer_enhanced_section import render_credit_officer_dashboard
-import numpy as np
+import os
 
+
+# Load real customer data
+@st.cache_data
+def load_customer_data():
+    """Load real customer data from CSV file"""
+    try:
+        df = pd.read_csv('dashboard_data.csv')
+        return df
+    except:
+        return None
+
+# Get customer data
+customer_df = load_customer_data()
 
 # Page configuration
 st.set_page_config(
@@ -23,9 +36,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom CSS for Professional Styling
 st.markdown("""
 <style>
+    /* Main Content Styling */
     .main-header {
         font-size: 3rem;
         font-weight: bold;
@@ -52,40 +66,258 @@ st.markdown("""
         border-radius: 0.5rem;
         border-left: 4px solid #28a745;
     }
+    
+    /* Enhanced Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    
+    /* Radio Button Styling */
+    [data-testid="stSidebar"] .stRadio > label {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.9rem;
+    }
+    
+    [data-testid="stSidebar"] .stRadio > div {
+        gap: 0.5rem;
+    }
+    
+    [data-testid="stSidebar"] .stRadio > div > label {
+        background-color: #ffffff;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    [data-testid="stSidebar"] .stRadio > div > label:hover {
+        background-color: #f0f4ff;
+        border-color: #667eea;
+        transform: translateX(3px);
+    }
+    
+    [data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"] > div:first-child {
+        background-color: #667eea;
+    }
+    
+    /* Selected Radio Button */
+    [data-testid="stSidebar"] .stRadio > div > label > div[data-checked="true"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Sidebar Divider */
+    [data-testid="stSidebar"] hr {
+        margin: 1.5rem 0;
+        border: none;
+        border-top: 2px solid #e0e0e0;
+    }
+    
+    /* Scrollbar Styling */
+    [data-testid="stSidebar"]::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    [data-testid="stSidebar"]::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    [data-testid="stSidebar"]::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 3px;
+    }
+    
+    [data-testid="stSidebar"]::-webkit-scrollbar-thumb:hover {
+        background: #764ba2;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar with Kee Platform Logo
-try:
-    # Try to load the KEE logo image
-    st.sidebar.image("assets/kee_logo.svg", width=200)
-except:
-    # Fallback to styled text logo if image not found
-    st.sidebar.markdown("""
-    <div style='text-align: center; padding: 20px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-bottom: 20px;'>
-        <h1 style='color: white; margin: 0; font-size: 2.5rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
-            KEE
-        </h1>
-        <p style='color: #f0f0f0; margin: 5px 0 0 0; font-size: 0.9rem; letter-spacing: 2px;'>PLATFORM</p>
+# Enhanced Professional Sidebar
+with st.sidebar:
+    # KEE Platform Logo and Branding
+    try:
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=180)
+    except:
+        st.markdown("""
+        <div style='text-align: center; padding: 25px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>
+            <h1 style='color: white; margin: 0; font-size: 2.8rem; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
+                KEE
+            </h1>
+            <p style='color: #f0f0f0; margin: 8px 0 0 0; font-size: 0.85rem; letter-spacing: 3px; font-weight: 500;'>
+                PLATFORM
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Dashboard Title
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 20px;'>
+        <h3 style='color: #1f77b4; margin: 0; font-size: 1.1rem; font-weight: 600;'>
+            Credit Risk Model Journey
+        </h3>
+        <p style='color: #666; margin: 5px 0 0 0; font-size: 0.75rem;'>
+            End-to-End ML Pipeline
+        </p>
     </div>
     """, unsafe_allow_html=True)
-
-st.sidebar.markdown("---")
-
-st.sidebar.title("🎯 Model Journey Navigation")
-stage = st.sidebar.radio(
-    "Select Stage",
-    [
-        "🏠 Overview",
-        "📥 1. Data Ingestion",
-        "📊 2. EDA & Data Profiling",
-        "🔧 3. Feature Engineering",
-        "🤖 4. Model Training",
-        "🚀 5. Model Deployment",
-        "📈 6. Dashboards & Personas",
-        "🤖 AI Assistant"
-    ]
-)
+    
+    st.markdown("---")
+    
+    # Navigation Section
+    st.markdown("""
+    <div style='margin-bottom: 15px;'>
+        <h4 style='color: #2c3e50; margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 600; 
+                   text-transform: uppercase; letter-spacing: 1px;'>
+            📍 Navigation
+        </h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Stage Selection with custom styling
+    stage = st.radio(
+        "Select Stage",
+        [
+            "🏠 Overview",
+            "📥 1. Data Ingestion",
+            "📊 2. EDA & Data Profiling",
+            "🔧 3. Feature Engineering",
+            "🤖 4. Model Training",
+            "🚀 5. Model Deployment",
+            "📈 6. Dashboards",
+            "💬 AI Assistant"
+        ],
+        label_visibility="collapsed"
+    )
+    
+    st.markdown("---")
+    
+    # Quick Stats Section
+    st.markdown("""
+    <div style='margin-bottom: 15px;'>
+        <h4 style='color: #2c3e50; margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 600; 
+                   text-transform: uppercase; letter-spacing: 1px;'>
+            📊 Quick Stats
+        </h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Compact metrics
+    st.markdown("""
+    <div style='background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 10px;'>
+        <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
+            <span style='color: #666; font-size: 0.75rem;'>Total Customers</span>
+            <span style='color: #1f77b4; font-weight: 600; font-size: 0.8rem;'>4,525</span>
+        </div>
+        <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
+            <span style='color: #666; font-size: 0.75rem;'>Model Accuracy</span>
+            <span style='color: #28a745; font-weight: 600; font-size: 0.8rem;'>98.7%</span>
+        </div>
+        <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
+            <span style='color: #666; font-size: 0.75rem;'>Data Sources</span>
+            <span style='color: #764ba2; font-weight: 600; font-size: 0.8rem;'>6 Active</span>
+        </div>
+        <div style='display: flex; justify-content: space-between;'>
+            <span style='color: #666; font-size: 0.75rem;'>Risk Score</span>
+            <span style='color: #ff7f0e; font-weight: 600; font-size: 0.8rem;'>0.34</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Pipeline Status
+    st.markdown("""
+    <div style='margin-bottom: 15px;'>
+        <h4 style='color: #2c3e50; margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 600; 
+                   text-transform: uppercase; letter-spacing: 1px;'>
+            ⚡ Pipeline Status
+        </h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style='background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 10px;'>
+        <div style='margin-bottom: 10px;'>
+            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
+                <span style='color: #666; font-size: 0.75rem;'>Data Ingestion</span>
+                <span style='color: #28a745; font-size: 0.7rem;'>✓ Complete</span>
+            </div>
+            <div style='background: #e9ecef; height: 4px; border-radius: 2px; overflow: hidden;'>
+                <div style='background: #28a745; height: 100%; width: 100%;'></div>
+            </div>
+        </div>
+        <div style='margin-bottom: 10px;'>
+            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
+                <span style='color: #666; font-size: 0.75rem;'>Model Training</span>
+                <span style='color: #28a745; font-size: 0.7rem;'>✓ Complete</span>
+            </div>
+            <div style='background: #e9ecef; height: 4px; border-radius: 2px; overflow: hidden;'>
+                <div style='background: #28a745; height: 100%; width: 100%;'></div>
+            </div>
+        </div>
+        <div style='margin-bottom: 10px;'>
+            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
+                <span style='color: #666; font-size: 0.75rem;'>Deployment</span>
+                <span style='color: #28a745; font-size: 0.7rem;'>✓ Live</span>
+            </div>
+            <div style='background: #e9ecef; height: 4px; border-radius: 2px; overflow: hidden;'>
+                <div style='background: #28a745; height: 100%; width: 100%;'></div>
+            </div>
+        </div>
+        <div>
+            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;'>
+                <span style='color: #666; font-size: 0.75rem;'>Monitoring</span>
+                <span style='color: #17a2b8; font-size: 0.7rem;'>● Active</span>
+            </div>
+            <div style='background: #e9ecef; height: 4px; border-radius: 2px; overflow: hidden;'>
+                <div style='background: #17a2b8; height: 100%; width: 100%;'></div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # System Health
+    st.markdown("""
+    <div style='margin-bottom: 10px;'>
+        <h4 style='color: #2c3e50; margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 600; 
+                   text-transform: uppercase; letter-spacing: 1px;'>
+            🔧 System Health
+        </h4>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style='background: #d4edda; padding: 10px 12px; border-radius: 8px; border-left: 3px solid #28a745;'>
+        <div style='display: flex; align-items: center; justify-content: space-between;'>
+            <div>
+                <div style='color: #155724; font-size: 0.75rem; font-weight: 600;'>All Systems Operational</div>
+                <div style='color: #155724; font-size: 0.65rem; margin-top: 2px;'>Uptime: 99.97%</div>
+            </div>
+            <div style='color: #28a745; font-size: 1.5rem;'>✓</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Footer info
+    st.markdown("""
+    <div style='text-align: center; padding: 15px 10px; background: #f8f9fa; border-radius: 8px; margin-top: 20px;'>
+        <p style='color: #666; margin: 0; font-size: 0.7rem;'>
+            <strong>Version</strong> 2.0.1
+        </p>
+        <p style='color: #999; margin: 5px 0 0 0; font-size: 0.65rem;'>
+            Last Updated: Nov 2024
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # AI Assistant Response Generator
 def generate_ai_response(query):
@@ -1589,8 +1821,8 @@ elif stage == "🚀 5. Model Deployment":
     # </div>
     # """, unsafe_allow_html=True)
 
-elif stage == "📈 6. Dashboards & Personas":
-    st.markdown('<div class="stage-header">📈 Stage 6: Dashboards & Personas</div>', unsafe_allow_html=True)
+elif stage == "📈 6. Dashboards":
+    st.markdown('<div class="stage-header">📈 Stage 6: Dashboards</div>', unsafe_allow_html=True)
     st.markdown("### Role-Based Dashboards")
     
     # Dashboard selection
@@ -1830,96 +2062,280 @@ elif stage == "📈 6. Dashboards & Personas":
         
         # Customer Search
         st.markdown("#### 🔍 Customer Lookup")
-        col1, col2 = st.columns([3, 1])
         
-        with col1:
-            customer_id = st.text_input("Enter Customer ID", placeholder="e.g., 8697")
-        with col2:
-            st.markdown("<br>", unsafe_allow_html=True)
-            search_btn = st.button("🔍 Search", use_container_width=True)
-        
-        if customer_id or search_btn:
-            st.markdown("---")
-            st.markdown("#### 👤 Customer Profile: 8697")
+        if customer_df is not None:
+            # Get list of available customer IDs
+            available_customers = customer_df['customer_id'].astype(str).tolist()
             
-            # Customer Overview
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3 = st.columns([2, 2, 1])
             
             with col1:
-                st.metric("Risk Score", "0.23", "Very Low Risk ✅")
+                customer_id_input = st.selectbox(
+                    "Select Customer ID",
+                    options=[""] + available_customers,
+                    format_func=lambda x: "Choose a customer..." if x == "" else f"Customer {x}"
+                )
+            
             with col2:
-                st.metric("Total GMV", "AED 156K", "+12% MoM")
+                if customer_id_input:
+                    customer_name = customer_df[customer_df['customer_id'].astype(str) == customer_id_input]['customer_name'].values[0]
+                    st.markdown(f"<br><strong>Name:</strong> {customer_name}", unsafe_allow_html=True)
+            
             with col3:
-                st.metric("Active Months", "34/36", "94% Active")
-            with col4:
-                st.metric("Credit Limit", "AED 250K", "Recommended")
+                st.markdown("<br>", unsafe_allow_html=True)
+                search_btn = st.button("🔍 Analyze", use_container_width=True)
+        else:
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                customer_id_input = st.text_input("Enter Customer ID", placeholder="e.g., 24")
+            with col2:
+                st.markdown("<br>", unsafe_allow_html=True)
+                search_btn = st.button("🔍 Search", use_container_width=True)
+        
+        if customer_id_input and customer_id_input != "":
+            st.markdown("---")
+            
+            # Initialize variables
+            customer_data = None
+            cust = None
+            
+            # Get customer data
+            if customer_df is not None:
+                customer_data = customer_df[customer_df['customer_id'].astype(str) == customer_id_input]
+                
+                if not customer_data.empty:
+                    cust = customer_data.iloc[0]
+                    
+                    st.markdown(f"#### 👤 Customer Profile: {cust['customer_name']} (ID: {cust['customer_id']})")
+                    
+                    # Customer Overview
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    # Determine risk level and color
+                    risk_score = cust['risk_score_30d']
+                    if risk_score < 0.3:
+                        risk_label = "Very Low Risk ✅"
+                        risk_delta = "Excellent"
+                    elif risk_score < 0.5:
+                        risk_label = "Low Risk ✅"
+                        risk_delta = "Good"
+                    elif risk_score < 0.7:
+                        risk_label = "Medium Risk ⚠️"
+                        risk_delta = "Monitor"
+                    else:
+                        risk_label = "High Risk 🔴"
+                        risk_delta = "Caution"
+                    
+                    with col1:
+                        st.metric("Risk Score (30d)", f"{risk_score:.3f}", risk_label)
+                    with col2:
+                        account_value = cust['account_value']
+                        st.metric("Account Value", f"AED {account_value:,.2f}", f"{cust['risk_level_30d']}")
+                    with col3:
+                        active_months = int(cust['active_months'])
+                        st.metric("Active Months", f"{active_months}/36", f"{(active_months/36*100):.0f}% Active")
+                    with col4:
+                        # Calculate recommended credit limit based on risk
+                        if risk_score < 0.3:
+                            credit_limit = min(account_value * 2, 250000)
+                        elif risk_score < 0.5:
+                            credit_limit = min(account_value * 1.5, 150000)
+                        elif risk_score < 0.7:
+                            credit_limit = min(account_value * 1.0, 75000)
+                        else:
+                            credit_limit = min(account_value * 0.5, 25000)
+                        st.metric("Credit Limit", f"AED {credit_limit:,.0f}", "Recommended")
+                else:
+                    st.warning(f"Customer ID {customer_id_input} not found in database.")
+                    st.stop()
+            else:
+                st.markdown("#### 👤 Customer Profile: Sample Customer")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Risk Score", "N/A", "Data not available")
+                with col2:
+                    st.metric("Total GMV", "N/A", "")
+                with col3:
+                    st.metric("Active Months", "N/A", "")
+                with col4:
+                    st.metric("Credit Limit", "N/A", "")
             
             st.markdown("---")
             
             # Detailed Metrics
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("#### 📊 Financial Metrics")
-                financial = pd.DataFrame({
-                    "Metric": [
-                        "Monthly Average GMV", "Total Orders",
-                        "Order Frequency", "GMV Growth Rate",
-                        "Volatility Score", "Days Since Last Order"
-                    ],
-                    "Value": [
-                        "AED 13,035", "287",
-                        "8.5/month", "+42%",
-                        "0.18 (Stable)", "3 days"
-                    ],
-                    "Status": ["✅", "✅", "✅", "✅", "✅", "✅"]
-                })
-                st.dataframe(financial, use_container_width=True, hide_index=True)
-            
-            with col2:
-                st.markdown("#### 🏦 External Data")
-                external = pd.DataFrame({
-                    "Source": [
-                        "AECB Credit Score", "Payment Partner Score",
-                        "Bank Avg Balance", "LOS Monthly Income",
-                        "DEWA Payment Rate", "Employment Status"
-                    ],
-                    "Value": [
-                        "745 (Excellent)", "82/100 (Low Risk)",
-                        "AED 85,000", "AED 12,500",
-                        "100% (Perfect)", "Employed (5 yrs)"
-                    ],
-                    "Status": ["✅", "✅", "✅", "✅", "✅", "✅"]
-                })
-                st.dataframe(external, use_container_width=True, hide_index=True)
+            if customer_df is not None and customer_data is not None and not customer_data.empty:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown("#### 📊 Financial Metrics")
+                    
+                    # Calculate monthly average
+                    monthly_avg = cust['account_value'] / max(cust['active_months'], 1) if cust['active_months'] > 0 else 0
+                    
+                    # Volatility status
+                    vol_status = "✅" if cust['volatility'] < 0.3 else ("⚠️" if cust['volatility'] < 0.6 else "🔴")
+                    vol_label = "Stable" if cust['volatility'] < 0.3 else ("Moderate" if cust['volatility'] < 0.6 else "Volatile")
+                    
+                    # Days since last order status
+                    days_status = "✅" if cust['days_since_last_order'] < 30 else ("⚠️" if cust['days_since_last_order'] < 90 else "🔴")
+                    
+                    # GMV slope status
+                    slope_status = "✅" if cust['gmv_slope'] > 100 else ("⚠️" if cust['gmv_slope'] > 0 else "🔴")
+                    slope_label = f"+{cust['gmv_slope']:.1f}%" if cust['gmv_slope'] > 0 else f"{cust['gmv_slope']:.1f}%"
+                    
+                    financial = pd.DataFrame({
+                        "Metric": [
+                            "Account Value", "Monthly Average",
+                            "Active Months", "GMV Growth Rate",
+                            "Volatility Score", "Days Since Last Order"
+                        ],
+                        "Value": [
+                            f"AED {cust['account_value']:,.2f}",
+                            f"AED {monthly_avg:,.2f}",
+                            f"{int(cust['active_months'])}/36",
+                            slope_label,
+                            f"{cust['volatility']:.3f} ({vol_label})",
+                            f"{int(cust['days_since_last_order'])} days"
+                        ],
+                        "Status": [
+                            "✅" if cust['account_value'] > 1000 else "⚠️",
+                            "✅" if monthly_avg > 100 else "⚠️",
+                            "✅" if cust['active_months'] > 12 else "⚠️",
+                            slope_status,
+                            vol_status,
+                            days_status
+                        ]
+                    })
+                    st.dataframe(financial, use_container_width=True, hide_index=True)
+                
+                with col2:
+                    st.markdown("#### 📈 Risk Trend Analysis")
+                    
+                    # Risk scores over time
+                    risk_trend = pd.DataFrame({
+                        "Period": ["30 Days", "60 Days", "90 Days"],
+                        "Risk Score": [
+                            f"{cust['risk_score_30d']:.3f}",
+                            f"{cust['risk_score_60d']:.3f}",
+                            f"{cust['risk_score_90d']:.3f}"
+                        ],
+                        "Risk Level": [
+                            cust['risk_level_30d'],
+                            "Medium" if cust['risk_score_60d'] > 0.5 else "Low",
+                            "High" if cust['risk_score_90d'] > 0.7 else ("Medium" if cust['risk_score_90d'] > 0.5 else "Low")
+                        ],
+                        "Trend": [
+                            "→",
+                            "↑" if cust['risk_score_60d'] > cust['risk_score_30d'] else "↓",
+                            "↑" if cust['risk_score_90d'] > cust['risk_score_60d'] else "↓"
+                        ]
+                    })
+                    st.dataframe(risk_trend, use_container_width=True, hide_index=True)
+                    
+                    # Additional context
+                    st.markdown("**Intervention Status:**")
+                    if pd.notna(cust['intervention_status']) and cust['intervention_status']:
+                        st.info(f"📋 {cust['intervention_status']}")
+                    else:
+                        st.success("✅ No intervention required")
+            else:
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("#### 📊 Financial Metrics")
+                    st.info("Data not available")
+                with col2:
+                    st.markdown("#### 🏦 External Data")
+                    st.info("Data not available")
             
             st.markdown("---")
             
             # Risk Factors
-            st.markdown("#### 🎯 Top Risk Drivers (SHAP Analysis)")
-            risk_factors = pd.DataFrame({
-                "Feature": [
-                    "Low Volatility", "High GMV", "Recent Activity",
-                    "Strong AECB Score", "Positive Growth", "High Frequency"
-                ],
-                "Impact": ["-0.15", "-0.12", "-0.08", "-0.06", "-0.05", "-0.04"],
-                "Effect": [
-                    "Reduces Risk", "Reduces Risk", "Reduces Risk",
-                    "Reduces Risk", "Reduces Risk", "Reduces Risk"
-                ]
-            })
-            st.dataframe(risk_factors, use_container_width=True, hide_index=True)
-            
-            st.markdown("---")
-            
-            # Recommendation
-            st.markdown("""
-            <div style='background: #d4edda; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;'>
-                <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Credit Decision: APPROVED</h4>
-                <p style='color: #155724; margin: 0;'><strong>Recommended Credit Limit:</strong> AED 250,000</p>
-                <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Excellent customer with consistent high-value transactions, low volatility, strong growth trajectory, and perfect credit history. Minimal risk of default.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            if customer_df is not None and customer_data is not None and not customer_data.empty:
+                st.markdown("#### 🎯 Key Risk Factors Analysis")
+                
+                # Analyze key factors
+                factors = []
+                
+                # Volatility
+                if cust['volatility'] < 0.3:
+                    factors.append(("Low Volatility", f"-{0.15:.2f}", "Reduces Risk", "✅"))
+                elif cust['volatility'] > 0.6:
+                    factors.append(("High Volatility", f"+{0.18:.2f}", "Increases Risk", "🔴"))
+                else:
+                    factors.append(("Moderate Volatility", f"+{0.08:.2f}", "Neutral", "⚠️"))
+                
+                # Account Value
+                if cust['account_value'] > 5000:
+                    factors.append(("High Account Value", f"-{0.12:.2f}", "Reduces Risk", "✅"))
+                elif cust['account_value'] > 1000:
+                    factors.append(("Moderate Account Value", f"-{0.05:.2f}", "Reduces Risk", "✅"))
+                else:
+                    factors.append(("Low Account Value", f"+{0.10:.2f}", "Increases Risk", "⚠️"))
+                
+                # Days Since Last Order
+                if cust['days_since_last_order'] < 30:
+                    factors.append(("Recent Activity", f"-{0.08:.2f}", "Reduces Risk", "✅"))
+                elif cust['days_since_last_order'] < 90:
+                    factors.append(("Moderate Activity", f"+{0.05:.2f}", "Neutral", "⚠️"))
+                else:
+                    factors.append(("Inactive Customer", f"+{0.15:.2f}", "Increases Risk", "🔴"))
+                
+                # GMV Slope
+                if cust['gmv_slope'] > 100:
+                    factors.append(("Positive Growth", f"-{0.10:.2f}", "Reduces Risk", "✅"))
+                elif cust['gmv_slope'] > 0:
+                    factors.append(("Stable Growth", f"-{0.03:.2f}", "Reduces Risk", "✅"))
+                else:
+                    factors.append(("Declining Trend", f"+{0.12:.2f}", "Increases Risk", "🔴"))
+                
+                # Active Months
+                if cust['active_months'] > 18:
+                    factors.append(("High Tenure", f"-{0.06:.2f}", "Reduces Risk", "✅"))
+                elif cust['active_months'] > 6:
+                    factors.append(("Moderate Tenure", f"-{0.02:.2f}", "Reduces Risk", "✅"))
+                else:
+                    factors.append(("Low Tenure", f"+{0.08:.2f}", "Increases Risk", "⚠️"))
+                
+                risk_factors_df = pd.DataFrame(factors, columns=["Feature", "Impact", "Effect", "Status"])
+                st.dataframe(risk_factors_df, use_container_width=True, hide_index=True)
+                
+                st.markdown("---")
+                
+                # Recommendation based on risk score
+                if risk_score < 0.3:
+                    st.markdown(f"""
+                    <div style='background: #d4edda; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;'>
+                        <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Credit Decision: APPROVED</h4>
+                        <p style='color: #155724; margin: 0;'><strong>Recommended Credit Limit:</strong> AED {credit_limit:,.0f}</p>
+                        <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Excellent customer with low risk score ({risk_score:.3f}), {int(cust['active_months'])} active months, and account value of AED {cust['account_value']:,.2f}. Strong candidate for credit extension.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif risk_score < 0.5:
+                    st.markdown(f"""
+                    <div style='background: #d4edda; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;'>
+                        <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Credit Decision: APPROVED (with conditions)</h4>
+                        <p style='color: #155724; margin: 0;'><strong>Recommended Credit Limit:</strong> AED {credit_limit:,.0f}</p>
+                        <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Good customer with acceptable risk score ({risk_score:.3f}). Recommend standard credit terms with regular monitoring.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif risk_score < 0.7:
+                    st.markdown(f"""
+                    <div style='background: #fff3cd; padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107;'>
+                        <h4 style='color: #856404; margin: 0 0 10px 0;'>⚠️ Credit Decision: CONDITIONAL APPROVAL</h4>
+                        <p style='color: #856404; margin: 0;'><strong>Recommended Credit Limit:</strong> AED {credit_limit:,.0f}</p>
+                        <p style='color: #856404; margin: 10px 0 0 0;'><strong>Rationale:</strong> Medium risk customer (score: {risk_score:.3f}). Recommend limited credit with enhanced monitoring and possible collateral requirements.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                    <div style='background: #f8d7da; padding: 20px; border-radius: 10px; border-left: 4px solid #dc3545;'>
+                        <h4 style='color: #721c24; margin: 0 0 10px 0;'>🔴 Credit Decision: DECLINED</h4>
+                        <p style='color: #721c24; margin: 0;'><strong>Maximum Credit Limit:</strong> AED {credit_limit:,.0f} (if approved)</p>
+                        <p style='color: #721c24; margin: 10px 0 0 0;'><strong>Rationale:</strong> High risk customer (score: {risk_score:.3f}). Recommend declining credit or requiring substantial collateral and guarantees. Close monitoring required if approved.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("Risk analysis not available")
         
         else:
             st.markdown("---")
@@ -2051,7 +2467,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     try:
-        st.image("assets/kee_logo.svg", width=100)
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
     except:
         st.markdown("""
         <div style='text-align: center;'>
