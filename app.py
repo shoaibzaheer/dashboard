@@ -140,7 +140,7 @@ st.markdown("""
 with st.sidebar:
     # KEE Platform Logo and Branding
     try:
-        st.image("streamlit_deployment/assets/kee_logo.svg", width=180)
+        st.image("assets/kee_logo.svg", width=180)
     except:
         st.markdown("""
         <div style='text-align: center; padding: 25px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
@@ -2467,7 +2467,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     try:
-        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
+        st.image("assets/kee_logo.svg", width=100)
     except:
         st.markdown("""
         <div style='text-align: center;'>
