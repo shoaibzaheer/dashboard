@@ -31,7 +31,7 @@ customer_df = load_customer_data()
 # Page configuration
 st.set_page_config(
     page_title="Kee Credit Risk Model",
-    page_icon="🎯",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
