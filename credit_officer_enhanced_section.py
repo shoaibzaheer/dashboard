@@ -141,7 +141,7 @@ def render_credit_officer_dashboard():
         
         with col2:
             # Monthly GMV trend
-            months = pd.date_range('2024-01-01', '2024-11-01', freq='M')
+            months = pd.date_range('2024-07-01', '2025-06-01', freq='M')
             gmv = np.random.uniform(10000, 15000, len(months))
             gmv = gmv + np.linspace(0, 3000, len(months))  # Add growth trend
             
@@ -283,7 +283,7 @@ def render_credit_officer_dashboard():
         
         with col2:
             # Income vs Expense trend
-            months = pd.date_range('2024-05-01', '2024-11-01', freq='M')
+            months = pd.date_range('2024-12-01', '2025-06-01', freq='M')
             income = np.random.uniform(17500, 19500, len(months))
             expenses = np.random.uniform(11500, 13000, len(months))
             
@@ -364,7 +364,7 @@ def render_credit_officer_dashboard():
         
         with col2:
             # Credit score trend
-            months = pd.date_range('2024-01-01', '2024-11-01', freq='M')
+            months = pd.date_range('2024-07-01', '2025-06-01', freq='M')
             scores = [720, 725, 728, 730, 735, 738, 740, 742, 743, 744, 745]
             
             fig = go.Figure()
@@ -447,7 +447,7 @@ def render_credit_officer_dashboard():
         
         with col2:
             # Monthly bill trend
-            months = pd.date_range('2024-01-01', '2024-11-01', freq='M')
+            months = pd.date_range('2024-07-01', '2025-06-01', freq='M')
             bills = [650, 700, 750, 800, 900, 1100, 1250, 1150, 950, 850, 800]
             
             fig = go.Figure()
@@ -547,14 +547,14 @@ def render_credit_officer_dashboard():
                     "✅ Verified"
                 ],
                 "Date": [
-                    "2024-11-01",
-                    "2024-11-01",
-                    "2024-11-02",
-                    "2024-11-02",
-                    "2024-11-01",
-                    "2024-11-02",
+                    "2025-06-01",
+                    "2025-06-01",
+                    "2025-06-02",
+                    "2025-06-02",
+                    "2025-06-01",
+                    "2025-06-02",
                     "-",
-                    "2024-11-03"
+                    "2025-06-03"
                 ]
             })
             st.dataframe(documents, use_container_width=True, hide_index=True)
@@ -807,11 +807,11 @@ def render_credit_officer_dashboard():
     
     decisions_data = pd.DataFrame({
         "Date": [
-            "2024-11-06 14:30",
-            "2024-11-06 13:15",
-            "2024-11-05 16:45",
-            "2024-11-05 11:20",
-            "2024-11-04 15:10"
+            "2025-06-06 14:30",
+            "2025-06-06 13:15",
+            "2025-06-05 16:45",
+            "2025-06-05 11:20",
+            "2025-06-04 15:10"
         ],
         "Customer ID": ["8697", "5432", "9876", "3456", "7890"],
         "Customer Name": [
