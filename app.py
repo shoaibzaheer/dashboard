@@ -58,7 +58,7 @@ st.markdown("""
 # Sidebar with Kee Platform Logo
 try:
     # Try to load the KEE logo image
-    st.sidebar.image("assets/kee_logo.svg", width=200)
+    st.sidebar.image("streamlit_deployment/assets/kee_logo.svg", width=200)
 except:
     # Fallback to styled text logo if image not found
     st.sidebar.markdown("""
@@ -215,9 +215,9 @@ elif stage == "📥 1. Data Ingestion":
     
     with col1:
         sources_data = {
-            "Source": ["Distribution Partner Data", "Payment Partner", "Bank Transactions", "AECB Data"],
-            "Records": ["4,525", "4,525", "3,200", "4,100"],
-            "Status": ["✅", "✅", "✅", "✅"]
+            "Source": ["Distribution Partner Data", "Payment Partner", "Bank Transactions", "AECB Data", "LOS Data", "Dewa Bills"],
+            "Records": ["4,525", "4,525", "3,200", "4,100", "4,200", "3,800"],
+            "Status": ["✅", "✅", "✅", "✅", "✅", "✅"]
         }
         st.dataframe(pd.DataFrame(sources_data), use_container_width=True, hide_index=True)
     
@@ -237,7 +237,7 @@ elif stage == "📥 1. Data Ingestion":
     # Detailed data source information
     st.markdown("#### 📋 Data Source Details")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["🏢 Distribution Partner Data", "💳 Payment Partner RSPI", "🏦 Bank Transactions", "📊 AECB Data"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🏢 Distribution Partner Data", "💳 Payment Partner RSPI", "🏦 Bank Transactions", "📊 AECB Data", "🏢 LOS Data", "⚡ Dewa Bills"])
     
     with tab1:
         st.markdown("**Distribution Partner Transactional Data**")
@@ -326,6 +326,48 @@ elif stage == "📥 1. Data Ingestion":
         }
         st.dataframe(pd.DataFrame(aecb_metrics), use_container_width=True, hide_index=True)
     
+    with tab5:
+        st.markdown("**LOS (Loan Origination System) Data**")
+        st.markdown("""
+        - **Source**: Internal LOS system integration
+        - **Records**: 4,200 loan applications (matched)
+        - **Key Fields**:
+          - Loan amount requested and approved
+          - Employment details and tenure
+          - Monthly income and obligations
+          - Loan purpose and risk category
+          - Collateral and guarantor information
+          - Application status and decision timeline
+        - **Update Frequency**: Real-time
+        - **Match Rate**: 92.8% (4,200 out of 4,525 customers)
+        """)
+        los_metrics = {
+            "Metric": ["Matched Customers", "Avg Loan Amount", "Approval Rate", "Avg Income", "Employment Rate"],
+            "Value": ["4,200", "AED 125K", "68%", "AED 8,500", "94%"]
+        }
+        st.dataframe(pd.DataFrame(los_metrics), use_container_width=True, hide_index=True)
+    
+    with tab6:
+        st.markdown("**Dewa Bills (Utility Payment History)**")
+        st.markdown("""
+        - **Source**: DEWA API integration
+        - **Records**: 3,800 customers (matched)
+        - **Key Fields**:
+          - Monthly electricity bill amounts
+          - Payment consistency and timeliness
+          - Late payment incidents and patterns
+          - Account age and history length
+          - Seasonal consumption patterns
+          - Disconnection/reconnection history
+        - **Update Frequency**: Monthly
+        - **Match Rate**: 84.0% (3,800 out of 4,525 customers)
+        """)
+        dewa_metrics = {
+            "Metric": ["Matched Customers", "Avg Monthly Bill", "Payment Rate", "Late Payments", "Avg Account Age"],
+            "Value": ["3,800", "AED 285", "96.5%", "2.1%", "4.2 years"]
+        }
+        st.dataframe(pd.DataFrame(dewa_metrics), use_container_width=True, hide_index=True)
+    
     st.markdown("---")
     
     # Data integration process
@@ -336,7 +378,7 @@ elif stage == "📥 1. Data Ingestion":
     with col1:
         st.markdown("**Integration Steps**")
         st.markdown("""
-        1. **Extract**: Pull data from 4 sources
+        1. **Extract**: Pull data from 6 sources
         2. **Transform**: Standardize formats and schemas
         3. **Match**: Link records using customer IDs
         4. **Validate**: Check data quality and completeness
@@ -1307,7 +1349,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     try:
-        st.image("assets/kee_logo.svg", width=100)
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
     except:
         st.markdown("""
         <div style='text-align: center;'>
