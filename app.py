@@ -609,7 +609,7 @@ def create_journey_flow():
 
 # Main content based on selected stage
 if stage == "🏠 Overview":
-    st.markdown('<div class="main-header">🎯 Kee Credit Risk Model</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">Kee Credit Risk Model</div>', unsafe_allow_html=True)
     st.markdown("### End-to-End ML Pipeline for Credit Risk Assessment")
     
     # Journey flow diagram - Card-based visual
