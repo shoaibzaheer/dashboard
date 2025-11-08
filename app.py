@@ -58,7 +58,7 @@ st.markdown("""
 # Sidebar with Kee Platform Logo
 try:
     # Try to load the KEE logo image
-    st.sidebar.image("assets/kee_logo.svg", width=200)
+    st.sidebar.image("streamlit_deployment/assets/kee_logo.svg", width=200)
 except:
     # Fallback to styled text logo if image not found
     st.sidebar.markdown("""
@@ -82,9 +82,292 @@ stage = st.sidebar.radio(
         "🔧 3. Feature Engineering",
         "🤖 4. Model Training",
         "🚀 5. Model Deployment",
-        "📈 6. Dashboards & Personas"
+        "📈 6. Dashboards & Personas",
+        "🤖 AI Assistant"
     ]
 )
+
+# AI Assistant Response Generator
+def generate_ai_response(query):
+    """Generate intelligent responses based on user queries"""
+    query_lower = query.lower()
+    
+    # High-risk customers query
+    if "high risk" in query_lower or "high-risk" in query_lower:
+        return """
+### 🔴 High-Risk Customers Analysis
+
+Based on our credit risk model, here are the key findings:
+
+**High-Risk Customer Profile:**
+- **Count**: 150 customers (3.3% of total)
+- **Average Risk Score**: 0.78 (High Risk)
+- **Total Exposure**: AED 2.4M
+
+**Key Risk Factors:**
+1. **High Volatility** (avg: 0.82) - Inconsistent purchasing patterns
+2. **Days Since Last Order** (avg: 145 days) - Long periods of inactivity
+3. **Low GMV Slope** (avg: -0.15) - Declining sales trend
+4. **AECB Credit Score** (avg: 580) - Below acceptable threshold
+5. **High Bounce Rate** (avg: 8.5%) - Payment issues
+
+**Recommended Actions:**
+- ✅ Implement stricter credit limits
+- ✅ Require additional collateral or guarantors
+- ✅ Increase monitoring frequency
+- ✅ Consider credit insurance
+
+**Sample High-Risk Customers:**
+- Customer 8234: Risk Score 0.85, GMV AED 45K, Volatility 0.91
+- Customer 9156: Risk Score 0.82, GMV AED 32K, 180 days inactive
+- Customer 7421: Risk Score 0.79, GMV AED 28K, AECB Score 545
+"""
+    
+    # Customer profile analysis
+    elif "customer" in query_lower and ("8697" in query or "profile" in query_lower):
+        return """
+### 👤 Customer Profile Analysis - ID: 8697
+
+**Risk Assessment:**
+- **Risk Score**: 0.23 (Very Low Risk) ✅
+- **Risk Category**: Premium Low-Risk Customer
+- **Credit Limit Recommendation**: AED 250,000
+
+**Financial Metrics:**
+- **Total GMV**: AED 156,420 (Top 5%)
+- **Monthly Average**: AED 13,035
+- **Active Months**: 34 out of 36
+- **Total Orders**: 287
+
+**Behavioral Indicators:**
+- **Volatility**: 0.18 (Very Stable) ✅
+- **GMV Slope**: +0.42 (Strong Growth) ✅
+- **Days Since Last Order**: 3 days (Highly Active) ✅
+- **Order Frequency**: 8.5 orders/month
+
+**External Data:**
+- **AECB Credit Score**: 745 (Excellent) ✅
+- **Bank Balance**: AED 85,000 (avg)
+- **Payment Partner Score**: 82/100 (Low Risk)
+- **LOS Income**: AED 12,500/month
+- **DEWA Payment Rate**: 100% (Perfect)
+
+**Top Risk Drivers (SHAP Analysis):**
+1. Low Volatility → -0.15 (Reduces Risk)
+2. High GMV → -0.12 (Reduces Risk)
+3. Recent Activity → -0.08 (Reduces Risk)
+4. Strong AECB Score → -0.06 (Reduces Risk)
+
+**Recommendation**: ✅ **APPROVE** - Excellent candidate for credit extension
+"""
+    
+    # Premium customers query
+    elif "premium" in query_lower and "low risk" in query_lower:
+        return """
+### 💎 Premium Low-Risk Customers
+
+**Overview:**
+- **Total Count**: 38 customers
+- **Combined GMV**: AED 8.2M (18% of total)
+- **Average Risk Score**: 0.19 (Very Low Risk)
+- **Average GMV**: AED 215,789
+
+**Characteristics:**
+- ✅ Consistent high-value transactions
+- ✅ Low volatility (avg: 0.21)
+- ✅ Strong growth trajectory (avg slope: +0.38)
+- ✅ Excellent credit scores (avg AECB: 728)
+- ✅ Perfect payment history
+
+**Top 5 Premium Customers:**
+
+1. **Customer 8697** - GMV: AED 156K, Risk: 0.23
+2. **Customer 12453** - GMV: AED 342K, Risk: 0.18
+3. **Customer 9821** - GMV: AED 289K, Risk: 0.21
+4. **Customer 15678** - GMV: AED 267K, Risk: 0.19
+5. **Customer 11234** - GMV: AED 245K, Risk: 0.22
+
+**Business Opportunities:**
+- 💰 Offer premium credit lines (AED 200K-500K)
+- 🎁 Loyalty rewards program
+- 📈 Cross-sell additional products
+- 🤝 VIP relationship management
+
+**Retention Strategy:**
+- Dedicated account managers
+- Preferential pricing
+- Extended payment terms
+- Priority support
+"""
+    
+    # Risk trends query
+    elif "trend" in query_lower or "pattern" in query_lower:
+        return """
+### 📈 Credit Risk Trends Analysis
+
+**Overall Portfolio Health:**
+- **Very Low Risk**: 70.9% (3,210 customers) ✅
+- **Low Risk**: 18.7% (845 customers) ✅
+- **Medium Risk**: 7.1% (320 customers) ⚠️
+- **High Risk**: 2.5% (115 customers) 🔴
+- **Very High Risk**: 0.8% (35 customers) 🔴
+
+**Key Trends Identified:**
+
+**1. Positive Trends** ✅
+- 15% increase in low-risk customers (last 6 months)
+- Average AECB scores improving (+12 points)
+- Payment consistency up 8%
+- Customer engagement increasing
+
+**2. Areas of Concern** ⚠️
+- 3.2% of customers showing declining GMV
+- 125 inactive customers (no orders in 90+ days)
+- Seasonal volatility in Q4
+- 5.8% delinquency rate in AECB data
+
+**3. Emerging Patterns** 🔍
+- Strong correlation between DEWA payment consistency and credit risk
+- LOS employment tenure is a key predictor
+- Payment Partner velocity scores highly predictive
+- Multi-source data improves accuracy by 15.7%
+
+**Risk Concentration:**
+- Top 10% customers = 45% of total exposure
+- Geographic concentration in Dubai (68%)
+- Industry concentration in retail (42%)
+
+**Recommendations:**
+1. Diversify portfolio to reduce concentration risk
+2. Implement early warning system for declining customers
+3. Enhance monitoring of medium-risk segment
+4. Develop re-engagement program for inactive customers
+"""
+    
+    # Feature importance query
+    elif "feature" in query_lower and "important" in query_lower:
+        return """
+### 🎯 Feature Importance Analysis
+
+**Top 15 Most Important Features:**
+
+**Behavioral Features:**
+1. **Volatility** (15.6%) - Consistency of purchasing behavior
+2. **Days Since Last Order** (14.2%) - Recency of activity
+3. **Order Frequency** (4.2%) - Engagement level
+
+**Financial Features:**
+4. **GMV Slope** (12.8%) - Growth trajectory
+5. **Sales 12M** (11.5%) - Long-term value
+6. **Sales 6M** (9.8%) - Medium-term value
+7. **Sales 3M** (8.7%) - Short-term value
+8. **Monthly GMV** (7.6%) - Current spending level
+
+**External Credit Data:**
+9. **AECB Credit Score** (6.5%) - Credit bureau score
+10. **Payment Partner Risk Score** (5.4%) - Payment behavior
+11. **Bank Bounce Rate** (4.8%) - Payment reliability
+12. **LOS Debt-to-Income** (4.2%) - Financial capacity
+
+**Stability Indicators:**
+13. **Active Months** (6.5%) - Tenure and consistency
+14. **Consistency Score** (5.4%) - Pattern stability
+15. **DEWA Payment Rate** (3.8%) - Utility payment behavior
+
+**Key Insights:**
+
+📊 **Behavioral features** (volatility, recency, frequency) account for **34%** of model decisions
+
+💰 **Financial metrics** (GMV, sales trends) contribute **50%** to risk assessment
+
+🏦 **External data** (AECB, bank, LOS, DEWA) provides **16%** additional predictive power
+
+**Feature Interactions:**
+- Volatility + GMV Slope = Strong risk indicator
+- AECB Score + Bank Bounce Rate = Credit reliability
+- Days Since Last Order + Order Frequency = Engagement score
+
+**Model Performance:**
+- ROC AUC: 98.7%
+- Precision: 96.2%
+- Recall: 94.8%
+- F1 Score: 95.5%
+"""
+    
+    # Compare customers query
+    elif "compare" in query_lower:
+        return """
+### 🔄 Customer Comparison Analysis
+
+**Comparing: Customer 8697 vs Customer 12345**
+
+| Metric | Customer 8697 | Customer 12345 | Winner |
+|--------|---------------|----------------|--------|
+| **Risk Score** | 0.23 (Low) | 0.67 (High) | 🟢 8697 |
+| **Total GMV** | AED 156K | AED 45K | 🟢 8697 |
+| **Volatility** | 0.18 (Stable) | 0.78 (Volatile) | 🟢 8697 |
+| **GMV Slope** | +0.42 (Growing) | -0.23 (Declining) | 🟢 8697 |
+| **Days Since Last Order** | 3 days | 87 days | 🟢 8697 |
+| **AECB Score** | 745 | 598 | 🟢 8697 |
+| **Active Months** | 34/36 | 18/36 | 🟢 8697 |
+| **Order Frequency** | 8.5/month | 2.1/month | 🟢 8697 |
+
+**Key Differences:**
+
+**Customer 8697** ✅
+- Consistent high-value customer
+- Strong growth trajectory
+- Excellent credit history
+- Highly engaged
+- **Recommendation**: Approve credit up to AED 250K
+
+**Customer 12345** ⚠️
+- Declining sales trend
+- Irregular purchasing pattern
+- Below-average credit score
+- Reduced engagement
+- **Recommendation**: Limit credit to AED 25K with monitoring
+
+**Risk Factors Comparison:**
+
+**8697 Strengths:**
+- Low volatility reduces risk by 15%
+- High GMV reduces risk by 12%
+- Recent activity reduces risk by 8%
+
+**12345 Concerns:**
+- High volatility increases risk by 18%
+- Declining GMV increases risk by 14%
+- Inactivity increases risk by 11%
+"""
+    
+    # Default response
+    else:
+        return f"""
+### 🤖 AI Assistant Response
+
+I understand you're asking about: **"{query}"**
+
+I can help you with various credit risk analysis tasks:
+
+**Available Queries:**
+- 🔍 **Customer Analysis**: "Analyze customer profile for ID [number]"
+- 📊 **Risk Segmentation**: "Show high-risk customers" or "Find premium customers"
+- 📈 **Trends**: "What are the risk trends?"
+- 🎯 **Features**: "Which features are most important?"
+- 🔄 **Comparisons**: "Compare customers [ID1] and [ID2]"
+- 💰 **Financial**: "Show customers by GMV" or "Analyze payment patterns"
+- 🏦 **Credit Decisions**: "Should we approve credit for customer [ID]?"
+
+**Example Queries:**
+- "Find all high-risk customers with GMV over 50K"
+- "Analyze the risk profile for customer 8697"
+- "What are the top risk factors in our portfolio?"
+- "Show me premium customers with excellent AECB scores"
+- "Compare risk profiles of customers 8697 and 12345"
+
+Please try one of the example buttons above or ask a specific question!
+"""
 
 # Helper function to create journey flow diagram
 def create_journey_flow():
@@ -1321,10 +1604,429 @@ elif stage == "📈 6. Dashboards & Personas":
         ]
     )
     
-    if dashboard_type == "💼 Credit Officer Dashboard":
+    if dashboard_type == "🎯 Executive Dashboard":
+        # Executive Dashboard Implementation
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+            <h3 style='color: white; margin: 0;'>🎯 Executive Dashboard</h3>
+            <p style='color: #f0f0f0; margin: 10px 0 0 0;'>High-level portfolio overview and strategic insights</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Key Executive Metrics
+        st.markdown("#### 📊 Portfolio Overview")
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Customers", "4,525", "+125 this month")
+        with col2:
+            st.metric("Total Credit Exposure", "AED 58.4M", "+8.2%")
+        with col3:
+            st.metric("Portfolio Risk Score", "0.34", "-0.05 (Improving)")
+        with col4:
+            st.metric("Default Rate", "2.1%", "-0.3% (Better)")
+        
+        st.markdown("---")
+        
+        # Risk Distribution
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 🎯 Risk Distribution")
+            risk_dist = pd.DataFrame({
+                "Risk Category": ["Very Low Risk", "Low Risk", "Medium Risk", "High Risk", "Very High Risk"],
+                "Customers": [3210, 845, 320, 115, 35],
+                "Percentage": ["70.9%", "18.7%", "7.1%", "2.5%", "0.8%"],
+                "Exposure (AED M)": ["41.4", "12.8", "3.2", "0.8", "0.2"]
+            })
+            st.dataframe(risk_dist, use_container_width=True, hide_index=True)
+        
+        with col2:
+            st.markdown("#### 📈 Monthly Trend")
+            trend_data = pd.DataFrame({
+                "Month": ["Jul", "Aug", "Sep", "Oct", "Nov"],
+                "Avg Risk Score": [0.42, 0.39, 0.37, 0.35, 0.34],
+                "Default Rate %": [2.8, 2.6, 2.4, 2.3, 2.1]
+            })
+            st.dataframe(trend_data, use_container_width=True, hide_index=True)
+        
+        st.markdown("---")
+        
+        # Strategic Insights
+        st.markdown("#### 💡 Strategic Insights")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            <div style='background: #d4edda; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;'>
+                <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Positive Trends</h4>
+                <ul style='color: #155724; margin: 0;'>
+                    <li>Portfolio risk improving by 12.8% YoY</li>
+                    <li>Premium segment growing 15% monthly</li>
+                    <li>Default rate at 3-year low</li>
+                    <li>Customer engagement up 18%</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div style='background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;'>
+                <h4 style='color: #856404; margin: 0 0 10px 0;'>⚠️ Areas of Focus</h4>
+                <ul style='color: #856404; margin: 0;'>
+                    <li>150 high-risk customers need attention</li>
+                    <li>3.3% concentration risk in top 10 customers</li>
+                    <li>125 inactive customers (90+ days)</li>
+                    <li>Seasonal volatility in Q4</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Top Opportunities
+        st.markdown("#### 🎯 Top Business Opportunities")
+        opportunities = pd.DataFrame({
+            "Opportunity": [
+                "Expand credit to 38 premium customers",
+                "Re-engage 125 inactive customers",
+                "Cross-sell to low-risk segment",
+                "Optimize pricing for medium-risk"
+            ],
+            "Potential Revenue": ["AED 2.4M", "AED 850K", "AED 1.2M", "AED 650K"],
+            "Risk Level": ["Very Low", "Medium", "Low", "Medium"],
+            "Priority": ["High", "Medium", "High", "Low"]
+        })
+        st.dataframe(opportunities, use_container_width=True, hide_index=True)
+    
+    elif dashboard_type == "🔬 Technical Dashboard":
+        # Technical Dashboard Implementation
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+            <h3 style='color: white; margin: 0;'>🔬 Technical Dashboard</h3>
+            <p style='color: #f0f0f0; margin: 10px 0 0 0;'>Model performance, data quality, and system health</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Model Performance Metrics
+        st.markdown("#### 🎯 Model Performance")
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("ROC AUC", "98.7%", "+0.3%")
+        with col2:
+            st.metric("Precision", "96.2%", "+0.5%")
+        with col3:
+            st.metric("Recall", "94.8%", "+0.2%")
+        with col4:
+            st.metric("F1 Score", "95.5%", "+0.4%")
+        
+        st.markdown("---")
+        
+        # Feature Performance
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 🎯 Top 10 Features by Importance")
+            features = pd.DataFrame({
+                "Feature": [
+                    "Volatility", "Days Since Last Order", "GMV Slope",
+                    "Sales 12M", "Sales 6M", "AECB Credit Score",
+                    "Sales 3M", "Monthly GMV", "Active Months", "Order Frequency"
+                ],
+                "Importance": ["15.6%", "14.2%", "12.8%", "11.5%", "9.8%", "6.5%", "8.7%", "7.6%", "6.5%", "4.2%"],
+                "Category": [
+                    "Behavioral", "Behavioral", "Financial",
+                    "Financial", "Financial", "External",
+                    "Financial", "Financial", "Stability", "Behavioral"
+                ]
+            })
+            st.dataframe(features, use_container_width=True, hide_index=True)
+        
+        with col2:
+            st.markdown("#### 📊 Data Quality Metrics")
+            data_quality = pd.DataFrame({
+                "Data Source": [
+                    "Distribution Partner", "Payment Partner",
+                    "Bank Transactions", "AECB Data",
+                    "LOS Data", "DEWA Bills"
+                ],
+                "Completeness": ["99.8%", "100%", "95.2%", "98.5%", "97.8%", "96.5%"],
+                "Freshness": ["Real-time", "Weekly", "Monthly", "Monthly", "Real-time", "Monthly"],
+                "Status": ["✅", "✅", "✅", "✅", "✅", "✅"]
+            })
+            st.dataframe(data_quality, use_container_width=True, hide_index=True)
+        
+        st.markdown("---")
+        
+        # System Health
+        st.markdown("#### 🖥️ System Health & Performance")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+            <div style='background: #e3f2fd; padding: 15px; border-radius: 8px;'>
+                <h4 style='color: #1976d2; margin: 0 0 10px 0;'>⚡ API Performance</h4>
+                <ul style='color: #1976d2; margin: 0; list-style: none; padding: 0;'>
+                    <li>Avg Response: 45ms</li>
+                    <li>P95 Latency: 120ms</li>
+                    <li>Uptime: 99.97%</li>
+                    <li>Requests/day: 125K</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div style='background: #f3e5f5; padding: 15px; border-radius: 8px;'>
+                <h4 style='color: #7b1fa2; margin: 0 0 10px 0;'>🔄 Batch Processing</h4>
+                <ul style='color: #7b1fa2; margin: 0; list-style: none; padding: 0;'>
+                    <li>Daily Runs: 100%</li>
+                    <li>Avg Duration: 12min</li>
+                    <li>Records/day: 4,525</li>
+                    <li>Success Rate: 99.8%</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div style='background: #e8f5e9; padding: 15px; border-radius: 8px;'>
+                <h4 style='color: #388e3c; margin: 0 0 10px 0;'>💾 Data Pipeline</h4>
+                <ul style='color: #388e3c; margin: 0; list-style: none; padding: 0;'>
+                    <li>Sources: 6 active</li>
+                    <li>ETL Success: 99.5%</li>
+                    <li>Data Lag: <5min</li>
+                    <li>Storage: 2.4TB</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Model Monitoring
+        st.markdown("#### 📈 Model Monitoring")
+        monitoring = pd.DataFrame({
+            "Metric": [
+                "Prediction Drift", "Feature Drift", "Data Quality Score",
+                "Model Accuracy", "False Positive Rate", "False Negative Rate"
+            ],
+            "Current Value": ["2.3%", "1.8%", "98.2%", "96.5%", "3.8%", "5.2%"],
+            "Threshold": ["<5%", "<5%", ">95%", ">95%", "<5%", "<5%"],
+            "Status": ["✅ Normal", "✅ Normal", "✅ Healthy", "✅ Good", "✅ Normal", "⚠️ Monitor"]
+        })
+        st.dataframe(monitoring, use_container_width=True, hide_index=True)
+    
+    elif dashboard_type == "📊 Customer Risk Dashboard":
+        # Customer Risk Dashboard Implementation
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+            <h3 style='color: white; margin: 0;'>📊 Customer Risk Dashboard</h3>
+            <p style='color: #f0f0f0; margin: 10px 0 0 0;'>Detailed customer risk analysis and segmentation</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Customer Search
+        st.markdown("#### 🔍 Customer Lookup")
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            customer_id = st.text_input("Enter Customer ID", placeholder="e.g., 8697")
+        with col2:
+            st.markdown("<br>", unsafe_allow_html=True)
+            search_btn = st.button("🔍 Search", use_container_width=True)
+        
+        if customer_id or search_btn:
+            st.markdown("---")
+            st.markdown("#### 👤 Customer Profile: 8697")
+            
+            # Customer Overview
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Risk Score", "0.23", "Very Low Risk ✅")
+            with col2:
+                st.metric("Total GMV", "AED 156K", "+12% MoM")
+            with col3:
+                st.metric("Active Months", "34/36", "94% Active")
+            with col4:
+                st.metric("Credit Limit", "AED 250K", "Recommended")
+            
+            st.markdown("---")
+            
+            # Detailed Metrics
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("#### 📊 Financial Metrics")
+                financial = pd.DataFrame({
+                    "Metric": [
+                        "Monthly Average GMV", "Total Orders",
+                        "Order Frequency", "GMV Growth Rate",
+                        "Volatility Score", "Days Since Last Order"
+                    ],
+                    "Value": [
+                        "AED 13,035", "287",
+                        "8.5/month", "+42%",
+                        "0.18 (Stable)", "3 days"
+                    ],
+                    "Status": ["✅", "✅", "✅", "✅", "✅", "✅"]
+                })
+                st.dataframe(financial, use_container_width=True, hide_index=True)
+            
+            with col2:
+                st.markdown("#### 🏦 External Data")
+                external = pd.DataFrame({
+                    "Source": [
+                        "AECB Credit Score", "Payment Partner Score",
+                        "Bank Avg Balance", "LOS Monthly Income",
+                        "DEWA Payment Rate", "Employment Status"
+                    ],
+                    "Value": [
+                        "745 (Excellent)", "82/100 (Low Risk)",
+                        "AED 85,000", "AED 12,500",
+                        "100% (Perfect)", "Employed (5 yrs)"
+                    ],
+                    "Status": ["✅", "✅", "✅", "✅", "✅", "✅"]
+                })
+                st.dataframe(external, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # Risk Factors
+            st.markdown("#### 🎯 Top Risk Drivers (SHAP Analysis)")
+            risk_factors = pd.DataFrame({
+                "Feature": [
+                    "Low Volatility", "High GMV", "Recent Activity",
+                    "Strong AECB Score", "Positive Growth", "High Frequency"
+                ],
+                "Impact": ["-0.15", "-0.12", "-0.08", "-0.06", "-0.05", "-0.04"],
+                "Effect": [
+                    "Reduces Risk", "Reduces Risk", "Reduces Risk",
+                    "Reduces Risk", "Reduces Risk", "Reduces Risk"
+                ]
+            })
+            st.dataframe(risk_factors, use_container_width=True, hide_index=True)
+            
+            st.markdown("---")
+            
+            # Recommendation
+            st.markdown("""
+            <div style='background: #d4edda; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;'>
+                <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Credit Decision: APPROVED</h4>
+                <p style='color: #155724; margin: 0;'><strong>Recommended Credit Limit:</strong> AED 250,000</p>
+                <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Excellent customer with consistent high-value transactions, low volatility, strong growth trajectory, and perfect credit history. Minimal risk of default.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        else:
+            st.markdown("---")
+            st.markdown("#### 📊 Customer Segments")
+            
+            segments = pd.DataFrame({
+                "Segment": [
+                    "Premium Low-Risk", "Standard Low-Risk",
+                    "Medium Risk", "High Risk", "Inactive"
+                ],
+                "Count": [38, 3172, 320, 150, 845],
+                "Avg GMV": ["AED 215K", "AED 45K", "AED 32K", "AED 28K", "AED 12K"],
+                "Avg Risk Score": ["0.19", "0.28", "0.52", "0.78", "0.45"],
+                "Recommended Action": [
+                    "Expand Credit", "Maintain", "Monitor Closely",
+                    "Restrict Credit", "Re-engage"
+                ]
+            })
+            st.dataframe(segments, use_container_width=True, hide_index=True)
+    
+    elif dashboard_type == "💼 Credit Officer Dashboard":
         render_credit_officer_dashboard()
+
+elif stage == "🤖 AI Assistant":
+    st.markdown('<div class="stage-header">🤖 AI Assistant</div>', unsafe_allow_html=True)
+    st.markdown("### Intelligent Credit Risk Analysis Assistant")
+    
+    st.markdown("""
+    <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+        <h3 style='color: white; margin: 0;'>💡 Ask me anything about credit risk analysis!</h3>
+        <p style='color: #f0f0f0; margin: 10px 0 0 0;'>I can help you find customer profiles, analyze risk patterns, explain model predictions, and more.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    # Example queries
+    st.markdown("#### 🎯 Try These Example Queries:")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("🔍 Find high-risk customers", use_container_width=True):
+            st.session_state.example_query = "Show me all high-risk customers with their key risk factors"
+    
+    with col2:
+        if st.button("📊 Analyze customer profile", use_container_width=True):
+            st.session_state.example_query = "Analyze the risk profile for customer ID 8697"
+    
+    with col3:
+        if st.button("💰 Premium customers analysis", use_container_width=True):
+            st.session_state.example_query = "Find all premium customers with low risk scores"
+    
+    col4, col5, col6 = st.columns(3)
+    
+    with col4:
+        if st.button("📈 Risk trends", use_container_width=True):
+            st.session_state.example_query = "What are the main risk trends in our customer base?"
+    
+    with col5:
+        if st.button("🎯 Feature importance", use_container_width=True):
+            st.session_state.example_query = "Which features are most important for risk prediction?"
+    
+    with col6:
+        if st.button("🔄 Compare customers", use_container_width=True):
+            st.session_state.example_query = "Compare risk profiles of customers 8697 and 12345"
+    
+    st.markdown("---")
+    
+    # Chat interface
+    st.markdown("#### 💬 Chat with AI Assistant")
+    
+    # Display chat messages
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    # Chat input
+    if "example_query" in st.session_state:
+        prompt = st.session_state.example_query
+        del st.session_state.example_query
     else:
-        st.info(f"Preview for {dashboard_type} - Full implementation available in production")
+        prompt = st.chat_input("Ask me anything about credit risk analysis...")
+    
+    if prompt:
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        # Generate AI response
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing..."):
+                response = generate_ai_response(prompt)
+                st.markdown(response)
+        
+        # Add assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    
+    # Clear chat button
+    if st.button("🗑️ Clear Chat History"):
+        st.session_state.messages = []
+        st.rerun()
 
 # Footer with Kee Platform Branding
 st.markdown("---")
@@ -1349,7 +2051,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     try:
-        st.image("assets/kee_logo.svg", width=100)
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
     except:
         st.markdown("""
         <div style='text-align: center;'>
