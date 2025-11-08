@@ -30,7 +30,7 @@ customer_df = load_customer_data()
 
 # Page configuration
 st.set_page_config(
-    page_title="Credit Risk Model Journey",
+    page_title="Kee Credit Risk Model",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -140,7 +140,7 @@ st.markdown("""
 with st.sidebar:
     # KEE Platform Logo and Branding
     try:
-        st.image("assets/kee_logo.svg", width=180)
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=180)
     except:
         st.markdown("""
         <div style='text-align: center; padding: 25px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
@@ -222,7 +222,7 @@ with st.sidebar:
             <span style='color: #764ba2; font-weight: 600; font-size: 0.8rem;'>6 Active</span>
         </div>
         <div style='display: flex; justify-content: space-between;'>
-            <span style='color: #666; font-size: 0.75rem;'>Risk Score</span>
+            <span style='color: #666; font-size: 0.75rem;'>Kee Score</span>
             <span style='color: #ff7f0e; font-weight: 600; font-size: 0.8rem;'>0.34</span>
         </div>
     </div>
@@ -314,7 +314,7 @@ with st.sidebar:
             <strong>Version</strong> 2.0.1
         </p>
         <p style='color: #999; margin: 5px 0 0 0; font-size: 0.65rem;'>
-            Last Updated: Nov 2024
+            Last Updated: June 2025
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -333,7 +333,7 @@ Based on our credit risk model, here are the key findings:
 
 **High-Risk Customer Profile:**
 - **Count**: 150 customers (3.3% of total)
-- **Average Risk Score**: 0.78 (High Risk)
+- **Average Kee Score**: 0.78 (High Risk)
 - **Total Exposure**: AED 2.4M
 
 **Key Risk Factors:**
@@ -350,9 +350,9 @@ Based on our credit risk model, here are the key findings:
 - ✅ Consider credit insurance
 
 **Sample High-Risk Customers:**
-- Customer 8234: Risk Score 0.85, GMV AED 45K, Volatility 0.91
-- Customer 9156: Risk Score 0.82, GMV AED 32K, 180 days inactive
-- Customer 7421: Risk Score 0.79, GMV AED 28K, AECB Score 545
+- Customer 8234: Kee Score 0.85, GMV AED 45K, Volatility 0.91
+- Customer 9156: Kee Score 0.82, GMV AED 32K, 180 days inactive
+- Customer 7421: Kee Score 0.79, GMV AED 28K, AECB Score 545
 """
     
     # Customer profile analysis
@@ -361,7 +361,7 @@ Based on our credit risk model, here are the key findings:
 ### 👤 Customer Profile Analysis - ID: 8697
 
 **Risk Assessment:**
-- **Risk Score**: 0.23 (Very Low Risk) ✅
+- **Kee Score**: 0.23 (Very Low Risk) ✅
 - **Risk Category**: Premium Low-Risk Customer
 - **Credit Limit Recommendation**: AED 250,000
 
@@ -401,7 +401,7 @@ Based on our credit risk model, here are the key findings:
 **Overview:**
 - **Total Count**: 38 customers
 - **Combined GMV**: AED 8.2M (18% of total)
-- **Average Risk Score**: 0.19 (Very Low Risk)
+- **Average Kee Score**: 0.19 (Very Low Risk)
 - **Average GMV**: AED 215,789
 
 **Characteristics:**
@@ -497,7 +497,7 @@ Based on our credit risk model, here are the key findings:
 
 **External Credit Data:**
 9. **AECB Credit Score** (6.5%) - Credit bureau score
-10. **Payment Partner Risk Score** (5.4%) - Payment behavior
+10. **Payment Partner Kee Score** (5.4%) - Payment behavior
 11. **Bank Bounce Rate** (4.8%) - Payment reliability
 12. **LOS Debt-to-Income** (4.2%) - Financial capacity
 
@@ -535,7 +535,7 @@ Based on our credit risk model, here are the key findings:
 
 | Metric | Customer 8697 | Customer 12345 | Winner |
 |--------|---------------|----------------|--------|
-| **Risk Score** | 0.23 (Low) | 0.67 (High) | 🟢 8697 |
+| **Kee Score** | 0.23 (Low) | 0.67 (High) | 🟢 8697 |
 | **Total GMV** | AED 156K | AED 45K | 🟢 8697 |
 | **Volatility** | 0.18 (Stable) | 0.78 (Volatile) | 🟢 8697 |
 | **GMV Slope** | +0.42 (Growing) | -0.23 (Declining) | 🟢 8697 |
@@ -777,7 +777,7 @@ elif stage == "📥 1. Data Ingestion":
         st.dataframe(pd.DataFrame(conektr_metrics), use_container_width=True, hide_index=True)
     
     with tab2:
-        st.markdown("**Payment Partner (Risk Score & Payment Intelligence)**")
+        st.markdown("**Payment Partner (Kee Score & Payment Intelligence)**")
         st.markdown("""
         - **Source**: Payment Partner API integration
         - **Records**: 4,525 customers (matched)
@@ -792,7 +792,7 @@ elif stage == "📥 1. Data Ingestion":
         """)
         
         mc_metrics = {
-            "Metric": ["Matched Customers", "Avg Risk Score", "High Risk %", "Medium Risk %", "Low Risk %"],
+            "Metric": ["Matched Customers", "Avg Kee Score", "High Risk %", "Medium Risk %", "Low Risk %"],
             "Value": ["4,525", "72.3/100", "8.2%", "23.5%", "68.3%"]
         }
         st.dataframe(pd.DataFrame(mc_metrics), use_container_width=True, hide_index=True)
@@ -1009,7 +1009,7 @@ elif stage == "📊 2. EDA & Data Profiling":
     
     with tab4:
         # Temporal patterns
-        months = pd.date_range('2022-01-01', '2024-11-01', freq='M')
+        months = pd.date_range('2022-01-01', '2025-06-01', freq='M')
         orders = np.random.poisson(3500, len(months)) + np.linspace(3000, 4500, len(months))
         
         fig = go.Figure()
@@ -1203,8 +1203,8 @@ elif stage == "🔧 3. Feature Engineering":
             "Financial", "Financial", "Growth", "Behavioral",
             
             # Payment Partner
-            "Risk Score", "Behavioral", "Engagement", "Financial",
-            "Stability", "Risk Score", "Growth", "Financial",
+            "Kee Score", "Behavioral", "Engagement", "Financial",
+            "Stability", "Kee Score", "Growth", "Financial",
             "Behavioral", "Behavioral",
             
             # Bank
@@ -1218,8 +1218,8 @@ elif stage == "🔧 3. Feature Engineering":
             "Financial", "Risk Indicator",
             
             # LOS
-            "Financial", "Risk Score", "Temporal", "Financial",
-            "Financial", "Financial", "Financial", "Risk Score",
+            "Financial", "Kee Score", "Temporal", "Financial",
+            "Financial", "Financial", "Financial", "Kee Score",
             
             # Dewa
             "Financial", "Stability", "Growth", "Risk Indicator",
@@ -1854,7 +1854,7 @@ elif stage == "📈 6. Dashboards":
         with col2:
             st.metric("Total Credit Exposure", "AED 58.4M", "+8.2%")
         with col3:
-            st.metric("Portfolio Risk Score", "0.34", "-0.05 (Improving)")
+            st.metric("Portfolio Kee Score", "0.34", "-0.05 (Improving)")
         with col4:
             st.metric("Default Rate", "2.1%", "-0.3% (Better)")
         
@@ -1877,7 +1877,7 @@ elif stage == "📈 6. Dashboards":
             st.markdown("#### 📈 Monthly Trend")
             trend_data = pd.DataFrame({
                 "Month": ["Jul", "Aug", "Sep", "Oct", "Nov"],
-                "Avg Risk Score": [0.42, 0.39, 0.37, 0.35, 0.34],
+                "Avg Kee Score": [0.42, 0.39, 0.37, 0.35, 0.34],
                 "Default Rate %": [2.8, 2.6, 2.4, 2.3, 2.1]
             })
             st.dataframe(trend_data, use_container_width=True, hide_index=True)
@@ -2127,7 +2127,7 @@ elif stage == "📈 6. Dashboards":
                         risk_delta = "Caution"
                     
                     with col1:
-                        st.metric("Risk Score (30d)", f"{risk_score:.3f}", risk_label)
+                        st.metric("Kee Score (30d)", f"{risk_score:.3f}", risk_label)
                     with col2:
                         account_value = cust['account_value']
                         st.metric("Account Value", f"AED {account_value:,.2f}", f"{cust['risk_level_30d']}")
@@ -2152,7 +2152,7 @@ elif stage == "📈 6. Dashboards":
                 st.markdown("#### 👤 Customer Profile: Sample Customer")
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric("Risk Score", "N/A", "Data not available")
+                    st.metric("Kee Score", "N/A", "Data not available")
                 with col2:
                     st.metric("Total GMV", "N/A", "")
                 with col3:
@@ -2211,10 +2211,10 @@ elif stage == "📈 6. Dashboards":
                 with col2:
                     st.markdown("#### 📈 Risk Trend Analysis")
                     
-                    # Risk scores over time
+                    # Kee scores over time
                     risk_trend = pd.DataFrame({
                         "Period": ["30 Days", "60 Days", "90 Days"],
-                        "Risk Score": [
+                        "Kee Score": [
                             f"{cust['risk_score_30d']:.3f}",
                             f"{cust['risk_score_60d']:.3f}",
                             f"{cust['risk_score_90d']:.3f}"
@@ -2301,13 +2301,13 @@ elif stage == "📈 6. Dashboards":
                 
                 st.markdown("---")
                 
-                # Recommendation based on risk score
+                # Recommendation based on Kee score
                 if risk_score < 0.3:
                     st.markdown(f"""
                     <div style='background: #d4edda; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;'>
                         <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Credit Decision: APPROVED</h4>
                         <p style='color: #155724; margin: 0;'><strong>Recommended Credit Limit:</strong> AED {credit_limit:,.0f}</p>
-                        <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Excellent customer with low risk score ({risk_score:.3f}), {int(cust['active_months'])} active months, and account value of AED {cust['account_value']:,.2f}. Strong candidate for credit extension.</p>
+                        <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Excellent customer with low Kee score ({risk_score:.3f}), {int(cust['active_months'])} active months, and account value of AED {cust['account_value']:,.2f}. Strong candidate for credit extension.</p>
                     </div>
                     """, unsafe_allow_html=True)
                 elif risk_score < 0.5:
@@ -2315,7 +2315,7 @@ elif stage == "📈 6. Dashboards":
                     <div style='background: #d4edda; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;'>
                         <h4 style='color: #155724; margin: 0 0 10px 0;'>✅ Credit Decision: APPROVED (with conditions)</h4>
                         <p style='color: #155724; margin: 0;'><strong>Recommended Credit Limit:</strong> AED {credit_limit:,.0f}</p>
-                        <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Good customer with acceptable risk score ({risk_score:.3f}). Recommend standard credit terms with regular monitoring.</p>
+                        <p style='color: #155724; margin: 10px 0 0 0;'><strong>Rationale:</strong> Good customer with acceptable Kee score ({risk_score:.3f}). Recommend standard credit terms with regular monitoring.</p>
                     </div>
                     """, unsafe_allow_html=True)
                 elif risk_score < 0.7:
@@ -2348,7 +2348,7 @@ elif stage == "📈 6. Dashboards":
                 ],
                 "Count": [38, 3172, 320, 150, 845],
                 "Avg GMV": ["AED 215K", "AED 45K", "AED 32K", "AED 28K", "AED 12K"],
-                "Avg Risk Score": ["0.19", "0.28", "0.52", "0.78", "0.45"],
+                "Avg Kee Score": ["0.19", "0.28", "0.52", "0.78", "0.45"],
                 "Recommended Action": [
                     "Expand Credit", "Maintain", "Monitor Closely",
                     "Restrict Credit", "Re-engage"
@@ -2389,7 +2389,7 @@ elif stage == "🤖 AI Assistant":
     
     with col3:
         if st.button("💰 Premium customers analysis", use_container_width=True):
-            st.session_state.example_query = "Find all premium customers with low risk scores"
+            st.session_state.example_query = "Find all premium customers with low Kee scores"
     
     col4, col5, col6 = st.columns(3)
     
@@ -2467,7 +2467,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     try:
-        st.image("assets/kee_logo.svg", width=100)
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
     except:
         st.markdown("""
         <div style='text-align: center;'>
@@ -2484,7 +2484,7 @@ with col2:
     #         Built with Streamlit | Powered by Advanced Analytics
     #     </p>
     #     <p style='color: #d0d0d0; margin: 8px 0 0 0; font-size: 0.75rem;'>
-    #         © 2024 Kee Platform. All rights reserved.
+    #         © 2025 Kee Platform. All rights reserved.
     #     </p>
     # </div>
     # """, unsafe_allow_html=True)
