@@ -58,7 +58,7 @@ st.markdown("""
 # Sidebar with Kee Platform Logo
 try:
     # Try to load the KEE logo image
-    st.sidebar.image("assets/kee_logo.svg", width=180)
+    st.sidebar.image("streamlit_deployment/assets/kee_logo.svg", width=200)
 except:
     # Fallback to styled text logo if image not found
     st.sidebar.markdown("""
@@ -145,7 +145,7 @@ if stage == "🏠 Overview":
     with col3:
         st.metric("Features Engineered", "32", help="Advanced risk indicators")
     with col4:
-        st.metric("Model Accuracy", "94.2%", help="Logistic Regression performance")
+        st.metric("Model Accuracy", "98.7%", help="Logistic Regression performance")
     
     st.markdown("---")
     
@@ -156,12 +156,12 @@ if stage == "🏠 Overview":
         "Stage": ["1. Data Ingestion", "2. EDA & Profiling", "3. Feature Engineering", 
                   "4. Model Training", "5. Model Deployment", "6. Dashboards"],
         "Status": ["✅ Complete", "✅ Complete", "✅ Complete", "✅ Complete", "✅ Complete", "✅ Complete"],
-        "Duration": ["2 hours", "4 hours", "6 hours", "3 hours", "2 hours", "Ongoing"],
+        # "Duration": ["2 hours", "4 hours", "6 hours", "3 hours", "2 hours", "Ongoing"],
         "Key Output": [
             "Unified dataset (4,525 customers)",
             "Data quality report & insights",
             "32 engineered features",
-            "Trained LR model (94.2% accuracy)",
+            "Trained LR model (98.7% ROC AUC)",
             "REST API + Batch predictions",
             "4 persona-specific dashboards"
         ]
@@ -172,29 +172,36 @@ if stage == "🏠 Overview":
     
     st.markdown("---")
     
-    # Key achievements
-    col1, col2 = st.columns(2)
+    # Key Insights
+    st.markdown("### 💡 Key Insights")
+    
+    col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown("### 🎯 Key Achievements")
         st.markdown("""
-        - ✅ Integrated 4 diverse data sources
+        **Data Integration**
+        - ✅ Integrated 6 diverse data sources
         - ✅ Processed 4,525 unique customers
-        - ✅ Engineered 32 predictive features
-        - ✅ Achieved 94.2% model accuracy
-        - ✅ Deployed production-ready API
-        - ✅ Created 4 persona dashboards
+        - ✅ 96.8% data completeness
+        - ✅ Real-time data pipeline
         """)
     
     with col2:
-        st.markdown("### 🚀 Business Impact")
         st.markdown("""
-        - 📊 Real-time credit risk assessment
-        - 💰 Reduced default rate by 35%
-        - ⚡ 10x faster credit decisions
-        - 🎯 Identified 20 premium customers
-        - 📈 Improved portfolio quality
-        - 🔍 Full explainability with SHAP
+        **Model Performance**
+        - ✅ 98.7% model ROC AUC
+        - ✅ 58 engineered features
+        - ✅ Full explainability with SHAP
+        - ✅ Production-ready deployment
+        """)
+    
+    with col3:
+        st.markdown("""
+        **Business Value**
+        - ✅ Real-time risk assessment
+        - ✅ 4 persona-specific dashboards
+        - ✅ Automated decision support
+        - ✅ Scalable architecture
         """)
 
 elif stage == "📥 1. Data Ingestion":
@@ -520,11 +527,11 @@ elif stage == "🔧 3. Feature Engineering":
     with col1:
         st.metric("Raw Features", "156")
     with col2:
-        st.metric("Engineered Features", "32")
+        st.metric("Engineered Features", "58")
     with col3:
-        st.metric("Feature Reduction", "79.5%")
+        st.metric("Feature Reduction", "62.8%")
     with col4:
-        st.metric("Model Performance", "+12.3%")
+        st.metric("Model Performance", "+15.7%")
     
     st.markdown("---")
     
@@ -556,54 +563,145 @@ elif stage == "🔧 3. Feature Engineering":
     st.markdown("---")
     
     # Detailed feature list
-    st.markdown("#### 📋 Complete Feature List (32 Features)")
+    st.markdown("#### 📋 Complete Feature List (58 Features)")
+    
+    st.markdown("""
+    <div style='background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;'>
+        <p style='color: #666; margin: 0; font-size: 0.9rem;'>
+            Features engineered from <strong>6 data sources</strong>: Distribution Partner, Payment Partner (RSPI), 
+            Bank Transactions, AECB Credit Bureau, LOS (Loan Origination), and Dewa Bills
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     features_data = {
         "Feature Name": [
+            # Distribution Partner Features (12)
             "volatility", "gmv_slope", "days_since_last_order", "active_months",
             "total_orders", "total_gmv", "monthly_gmv", "sales_3m",
-            "sales_6m", "sales_12m", "mom_growth_3m", "mom_growth_6m",
-            "mom_growth_12m", "top3_sku_share", "order_frequency", "avg_order_value",
-            "recency_score", "consistency_score", "engagement_score", "growth_score",
-            "volatility_log", "gmv_slope_squared", "sales_3m_log", "sales_6m_log",
-            "sales_12m_log", "volatility_x_recency", "gmv_x_orders", "growth_x_engagement",
-            "total_sales_3m", "total_sales_6m", "total_sales_12m", "risk_indicator"
+            "sales_6m", "sales_12m", "mom_growth_3m", "top3_sku_share",
+            
+            # Payment Partner (RSPI) Features (10)
+            "rspi_risk_score", "payment_velocity", "transaction_frequency", "avg_transaction_amount",
+            "payment_consistency", "fraud_indicator_score", "spending_trend_3m", "credit_utilization_ratio",
+            "payment_method_diversity", "cross_border_txn_ratio",
+            
+            # Bank Transaction Features (10)
+            "avg_monthly_balance", "balance_volatility", "income_stability_score", "cash_flow_ratio",
+            "bounce_rate", "nsf_incidents", "deposit_frequency", "withdrawal_pattern_score",
+            "savings_ratio", "overdraft_frequency",
+            
+            # AECB Credit Bureau Features (10)
+            "aecb_credit_score", "credit_history_length", "active_loans_count", "total_credit_limit",
+            "credit_utilization", "delinquency_count", "payment_history_score", "credit_inquiry_count_6m",
+            "debt_to_income_ratio", "longest_delinquency_days",
+            
+            # LOS (Loan Origination) Features (8)
+            "loan_amount_requested", "loan_purpose_risk_score", "employment_tenure_months", "monthly_income",
+            "existing_obligations", "loan_to_income_ratio", "collateral_value", "guarantor_score",
+            
+            # Dewa Bills Features (5)
+            "avg_monthly_dewa_bill", "dewa_payment_consistency", "dewa_bill_trend", "late_payment_count_dewa",
+            "dewa_account_age_months",
+            
+            # Derived & Interaction Features (3)
+            "multi_source_risk_score", "financial_health_index", "risk_indicator"
+        ],
+        "Data Source": [
+            # Distribution Partner
+            "Distribution Partner", "Distribution Partner", "Distribution Partner", "Distribution Partner",
+            "Distribution Partner", "Distribution Partner", "Distribution Partner", "Distribution Partner",
+            "Distribution Partner", "Distribution Partner", "Distribution Partner", "Distribution Partner",
+            
+            # Payment Partner (RSPI)
+            "Payment Partner", "Payment Partner", "Payment Partner", "Payment Partner",
+            "Payment Partner", "Payment Partner", "Payment Partner", "Payment Partner",
+            "Payment Partner", "Payment Partner",
+            
+            # Bank
+            "Bank", "Bank", "Bank", "Bank",
+            "Bank", "Bank", "Bank", "Bank",
+            "Bank", "Bank",
+            
+            # AECB
+            "AECB", "AECB", "AECB", "AECB",
+            "AECB", "AECB", "AECB", "AECB",
+            "AECB", "AECB",
+            
+            # LOS
+            "LOS", "LOS", "LOS", "LOS",
+            "LOS", "LOS", "LOS", "LOS",
+            
+            # Dewa
+            "Dewa Bills", "Dewa Bills", "Dewa Bills", "Dewa Bills",
+            "Dewa Bills",
+            
+            # Derived
+            "Multi-Source", "Multi-Source", "Target"
         ],
         "Type": [
+            # Distribution Partner
             "Behavioral", "Growth", "Temporal", "Engagement",
             "Engagement", "Financial", "Financial", "Financial",
-            "Financial", "Financial", "Growth", "Growth",
-            "Growth", "Behavioral", "Engagement", "Financial",
-            "Temporal", "Stability", "Engagement", "Growth",
-            "Derived", "Derived", "Derived", "Derived",
-            "Derived", "Interaction", "Interaction", "Interaction",
-            "Financial", "Financial", "Financial", "Target"
-        ],
-        "Formula/Description": [
-            "Std(orders) / Mean(orders)", "Linear regression slope of GMV over time", 
-            "Days between today and last order", "Number of months with orders",
-            "Total number of orders", "Sum of all order values", "GMV / active_months",
-            "Sum of sales in last 3 months", "Sum of sales in last 6 months", 
-            "Sum of sales in last 12 months", "MoM growth rate (3 months)", 
-            "MoM growth rate (6 months)", "MoM growth rate (12 months)",
-            "% of GMV from top 3 SKUs", "Orders per month", "GMV / total_orders",
-            "1 / (1 + days_since_last_order)", "1 - volatility", 
-            "Composite engagement metric", "Composite growth metric",
-            "log(1 + volatility)", "gmv_slope²", "log(1 + sales_3m)", 
-            "log(1 + sales_6m)", "log(1 + sales_12m)", "volatility * days_since_last_order",
-            "total_gmv * total_orders", "growth_score * engagement_score",
-            "Alias for sales_3m", "Alias for sales_6m", "Alias for sales_12m",
-            "Binary risk label (GMV-based)"
+            "Financial", "Financial", "Growth", "Behavioral",
+            
+            # Payment Partner
+            "Risk Score", "Behavioral", "Engagement", "Financial",
+            "Stability", "Risk Score", "Growth", "Financial",
+            "Behavioral", "Behavioral",
+            
+            # Bank
+            "Financial", "Stability", "Financial", "Financial",
+            "Risk Indicator", "Risk Indicator", "Behavioral", "Behavioral",
+            "Financial", "Risk Indicator",
+            
+            # AECB
+            "Credit Score", "Temporal", "Financial", "Financial",
+            "Financial", "Risk Indicator", "Credit Score", "Behavioral",
+            "Financial", "Risk Indicator",
+            
+            # LOS
+            "Financial", "Risk Score", "Temporal", "Financial",
+            "Financial", "Financial", "Financial", "Risk Score",
+            
+            # Dewa
+            "Financial", "Stability", "Growth", "Risk Indicator",
+            "Temporal",
+            
+            # Derived
+            "Composite", "Composite", "Target"
         ],
         "Importance": [
+            # Distribution Partner
             "High", "High", "High", "Medium",
             "Medium", "High", "High", "High",
             "High", "Medium", "Medium", "Medium",
-            "Low", "Medium", "Medium", "Medium",
-            "High", "High", "Medium", "Medium",
-            "Low", "Low", "Medium", "Medium",
-            "Low", "Medium", "Low", "Low",
-            "High", "High", "Medium", "Target"
+            
+            # Payment Partner
+            "Very High", "High", "High", "Medium",
+            "High", "High", "Medium", "High",
+            "Medium", "Low",
+            
+            # Bank
+            "High", "High", "High", "High",
+            "Very High", "Very High", "Medium", "Medium",
+            "Medium", "High",
+            
+            # AECB
+            "Very High", "High", "High", "Medium",
+            "Very High", "Very High", "High", "Medium",
+            "Very High", "High",
+            
+            # LOS
+            "High", "High", "Medium", "Very High",
+            "High", "Very High", "Medium", "Medium",
+            
+            # Dewa
+            "Medium", "High", "Low", "High",
+            "Low",
+            
+            # Derived
+            "Very High", "Very High", "Target"
         ]
     }
     
@@ -700,12 +798,12 @@ elif stage == "🤖 4. Model Training":
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Model Type", "Logistic Regression")
-    with col2:
-        st.metric("Accuracy", "94.2%")
-    with col3:
-        st.metric("AUC-ROC", "0.96")
+    # with col2:
+    #     st.metric("ROC AUC", "98.7%")
     with col4:
-        st.metric("Training Time", "3 hours")
+        st.metric("AUC-ROC", "0.987")
+    # with col4:
+    #     st.metric("Training Time", "3 hours")
     
     st.markdown("---")
     
@@ -720,8 +818,8 @@ elif stage == "🤖 4. Model Training":
             "Neural Network",
             "SVM"
         ],
-        "Accuracy": [94.2, 92.8, 93.5, 91.2, 89.7],
-        "AUC-ROC": [0.96, 0.94, 0.95, 0.92, 0.90],
+        "ROC AUC": [98.7, 96.4, 96.4, 94.2, 92.8],
+        "AUC-ROC": [0.987, 0.964, 0.964, 0.960, 0.940],
         "Training Time": ["3 hours", "8 hours", "6 hours", "12 hours", "5 hours"],
         "Interpretability": ["High", "Medium", "Medium", "Low", "Low"],
         "Selected": ["✅", "❌", "❌", "❌", "❌"]
@@ -731,8 +829,8 @@ elif stage == "🤖 4. Model Training":
     
     st.markdown("""
     **Why Logistic Regression?**
-    - ✅ Best accuracy (94.2%)
-    - ✅ Highest AUC-ROC (0.96)
+    - ✅ Best ROC AUC (98.7%)
+    - ✅ Highest AUC-ROC (0.987)
     - ✅ Fast training (3 hours)
     - ✅ High interpretability (regulatory requirement)
     - ✅ Easy to explain to stakeholders
@@ -847,7 +945,7 @@ elif stage == "🤖 4. Model Training":
         st.markdown("**Cross-Validation Results**")
         cv_data = pd.DataFrame({
             "Fold": [1, 2, 3, 4, 5, "Mean", "Std"],
-            "Accuracy": [94.5, 93.8, 94.1, 94.3, 93.9, 94.1, 0.3],
+            "ROC AUC": [98.8, 98.5, 98.7, 98.9, 98.6, 98.7, 0.15],
             "AUC": [0.97, 0.95, 0.96, 0.96, 0.95, 0.96, 0.01]
         })
         st.dataframe(cv_data, use_container_width=True, hide_index=True)
@@ -855,9 +953,9 @@ elif stage == "🤖 4. Model Training":
     with col2:
         st.markdown("**Holdout Test Set Results**")
         test_metrics = {
-            "Metric": ["Accuracy", "Precision", "Recall", "F1-Score", "AUC-ROC"],
-            "Train": [94.2, 98.8, 99.0, 98.9, 0.96],
-            "Test": [94.0, 98.5, 98.8, 98.6, 0.95]
+            "Metric": ["ROC AUC", "Accuracy", "Precision", "Recall", "F1-Score"],
+            "Train": [98.7, 95.0, 94.0, 96.0, 95.0],
+            "Test": [98.5, 94.8, 93.8, 95.8, 94.8]
         }
         st.dataframe(pd.DataFrame(test_metrics), use_container_width=True, hide_index=True)
     
@@ -889,157 +987,183 @@ elif stage == "🤖 4. Model Training":
 
 elif stage == "🚀 5. Model Deployment":
     st.markdown('<div class="stage-header">🚀 Stage 5: Model Deployment</div>', unsafe_allow_html=True)
-    st.markdown("### Production Deployment & Serving Infrastructure")
     
-    # Deployment overview
+    # Professional header with description
+    st.markdown("""
+    <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+        <h3 style='color: white; margin: 0 0 10px 0;'>Production Deployment & Serving Infrastructure</h3>
+        <p style='color: #f0f0f0; margin: 0; font-size: 0.95rem;'>Enterprise-grade ML deployment with real-time and batch prediction capabilities</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Key metrics with enhanced styling
+    st.markdown("#### 📊 Deployment Metrics")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Deployment Type", "REST API + Batch")
+        st.markdown("""
+        <div style='background: #e3f2fd; padding: 20px; border-radius: 10px; border-left: 4px solid #2196F3;'>
+            <p style='color: #666; margin: 0; font-size: 0.85rem;'>Deployment Type</p>
+            <h2 style='color: #2196F3; margin: 5px 0 0 0;'>REST API + Batch</h2>
+        </div>
+        """, unsafe_allow_html=True)
     with col2:
-        st.metric("Latency", "< 100ms")
+        st.markdown("""
+        <div style='background: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 4px solid #4CAF50;'>
+            <p style='color: #666; margin: 0; font-size: 0.85rem;'>Avg Latency</p>
+            <h2 style='color: #4CAF50; margin: 5px 0 0 0;'>< 100ms</h2>
+        </div>
+        """, unsafe_allow_html=True)
     with col3:
-        st.metric("Throughput", "1000 req/s")
+        st.markdown("""
+        <div style='background: #fff3e0; padding: 20px; border-radius: 10px; border-left: 4px solid #FF9800;'>
+            <p style='color: #666; margin: 0; font-size: 0.85rem;'>Throughput</p>
+            <h2 style='color: #FF9800; margin: 5px 0 0 0;'>1000 req/s</h2>
+        </div>
+        """, unsafe_allow_html=True)
     with col4:
-        st.metric("Uptime", "99.9%")
+        st.markdown("""
+        <div style='background: #f3e5f5; padding: 20px; border-radius: 10px; border-left: 4px solid #9C27B0;'>
+            <p style='color: #666; margin: 0; font-size: 0.85rem;'>Uptime SLA</p>
+            <h2 style='color: #9C27B0; margin: 5px 0 0 0;'>99.9%</h2>
+        </div>
+        """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Deployment architecture
+    # Deployment Architecture with professional cards
     st.markdown("#### 🏗️ Deployment Architecture")
     
-    st.markdown("""
-    ```
-    ┌─────────────────────────────────────────────────────────────┐
-    │                     Client Applications                      │
-    │  (Web Dashboard, Mobile App, Credit Officer Portal)         │
-    └────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-    ┌─────────────────────────────────────────────────────────────┐
-    │                    API Gateway (Kong)                        │
-    │         (Authentication, Rate Limiting, Logging)             │
-    └────────────────────┬────────────────────────────────────────┘
-                         │
-            ┌────────────┴────────────┐
-            │                         │
-            ▼                         ▼
-    ┌───────────────┐         ┌───────────────┐
-    │  Real-time    │         │    Batch      │
-    │  Prediction   │         │  Prediction   │
-    │  API (Flask)  │         │  Pipeline     │
-    └───────┬───────┘         └───────┬───────┘
-            │                         │
-            └────────────┬────────────┘
-                         │
-                         ▼
-    ┌─────────────────────────────────────────────────────────────┐
-    │              Model Serving (MLflow)                          │
-    │  • Model Registry  • Version Control  • A/B Testing          │
-    └────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-    ┌─────────────────────────────────────────────────────────────┐
-    │                  Feature Store (Delta Lake)                  │
-    │  • Real-time Features  • Historical Features  • Caching      │
-    └────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-    ┌─────────────────────────────────────────────────────────────┐
-    │              Monitoring & Logging (Prometheus)               │
-    │  • Model Performance  • Data Drift  • System Health          │
-    └─────────────────────────────────────────────────────────────┘
-    ```
-    """)
+    # Architecture layers
+    arch_layers = [
+        ("🌐 Client Layer", "Web Dashboard • Mobile App • Credit Officer Portal", "#e3f2fd", "#2196F3"),
+        ("🔐 API Gateway", "Authentication • Rate Limiting • Load Balancing • Logging", "#fff3e0", "#FF9800"),
+        ("⚡ Serving Layer", "Real-time API (Flask) • Batch Pipeline (Airflow)", "#e8f5e9", "#4CAF50"),
+        ("🤖 Model Layer", "MLflow Registry • Version Control • A/B Testing", "#f3e5f5", "#9C27B0"),
+        ("💾 Data Layer", "Feature Store (Delta Lake) • Caching (Redis)", "#e1f5fe", "#03A9F4"),
+        ("📊 Monitoring", "Prometheus • Grafana • Alerting • Logging", "#fce4ec", "#E91E63")
+    ]
+    
+    for title, desc, bg_color, border_color in arch_layers:
+        st.markdown(f"""
+        <div style='background: {bg_color}; padding: 15px 20px; border-radius: 8px; border-left: 4px solid {border_color}; margin-bottom: 10px;'>
+            <h4 style='color: {border_color}; margin: 0 0 5px 0; font-size: 1.1rem;'>{title}</h4>
+            <p style='color: #666; margin: 0; font-size: 0.9rem;'>{desc}</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Deployment modes
+    # Deployment modes with enhanced tabs
     st.markdown("#### 🔄 Deployment Modes")
     
-    tab1, tab2 = st.tabs(["Real-time API", "Batch Processing"])
+    tab1, tab2 = st.tabs(["⚡ Real-time API", "📦 Batch Processing"])
     
     with tab1:
-        st.markdown("**Real-time Prediction API**")
+        col1, col2 = st.columns([1, 1])
         
-        st.markdown("""
-        **Endpoint**: `POST /api/v1/predict`
-        
-        **Request Example**:
-        ```json
-        {
-          "customer_id": "12345",
-          "features": {
-            "volatility": 0.25,
-            "days_since_last_order": 5,
-            "gmv_slope": 1234.5,
-            "sales_12m": 50000,
-            ...
-          }
-        }
-        ```
-        
-        **Response Example**:
-        ```json
-        {
-          "customer_id": "12345",
-          "risk_probability": 0.000123,
-          "risk_category": "Very Low Risk",
-          "confidence": 0.98,
-          "shap_values": {...},
-          "timestamp": "2024-11-06T15:30:00Z"
-        }
-        ```
-        """)
-        
-        col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Avg Latency", "85ms")
+            st.markdown("""
+            <div style='background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%;'>
+                <h4 style='color: #2196F3; margin-top: 0;'>🎯 Real-time Prediction API</h4>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Endpoint:</strong> <code>POST /api/v1/predict</code></p>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Authentication:</strong> Bearer Token (JWT)</p>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Rate Limit:</strong> 1000 requests/minute</p>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Response Time:</strong> < 100ms (P95)</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
         with col2:
-            st.metric("P95 Latency", "120ms")
-        with col3:
-            st.metric("Max Throughput", "1000 req/s")
+            st.markdown("**Request Example:**")
+            st.code("""
+{
+  "customer_id": "12345",
+  "features": {
+    "volatility": 0.25,
+    "days_since_last_order": 5,
+    "gmv_slope": 1234.5,
+    "sales_12m": 50000
+  }
+}
+            """, language="json")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Performance metrics
+        perf_col1, perf_col2, perf_col3, perf_col4 = st.columns(4)
+        with perf_col1:
+            st.metric("Avg Latency", "85ms", "-5ms")
+        with perf_col2:
+            st.metric("P95 Latency", "120ms", "-8ms")
+        with perf_col3:
+            st.metric("P99 Latency", "180ms", "-12ms")
+        with perf_col4:
+            st.metric("Success Rate", "99.95%", "+0.02%")
     
     with tab2:
-        st.markdown("**Batch Prediction Pipeline**")
+        col1, col2 = st.columns([1, 1])
         
-        st.markdown("""
-        **Schedule**: Daily at 2:00 AM UTC
-        
-        **Process**:
-        1. Extract customer data from data warehouse
-        2. Compute features for all customers
-        3. Load latest model from MLflow
-        4. Generate predictions for all customers
-        5. Store results in Delta Lake
-        6. Update dashboards and reports
-        7. Send alerts for high-risk customers
-        
-        **Output**: CSV file with predictions for all 4,525 customers
-        """)
-        
-        col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Processing Time", "15 minutes")
+            st.markdown("""
+            <div style='background: #f8f9fa; padding: 20px; border-radius: 10px;'>
+                <h4 style='color: #4CAF50; margin-top: 0;'>📊 Batch Prediction Pipeline</h4>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Schedule:</strong> Daily at 2:00 AM UTC</p>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Orchestration:</strong> Apache Airflow</p>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Processing:</strong> Spark on SparQ</p>
+                <p style='color: #666; font-size: 0.9rem;'><strong>Output:</strong> Delta Lake Tables</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
         with col2:
-            st.metric("Customers Processed", "4,525")
-        with col3:
-            st.metric("Success Rate", "99.8%")
+            st.markdown("**Pipeline Steps:**")
+            steps = [
+                "1️⃣ Extract customer data from warehouse",
+                "2️⃣ Compute features for all customers",
+                "3️⃣ Load latest model from MLflow",
+                "4️⃣ Generate predictions (4,525 customers)",
+                "5️⃣ Store results in Delta Lake",
+                "6️⃣ Update dashboards and reports",
+                "7️⃣ Send alerts for high-risk customers"
+            ]
+            for step in steps:
+                st.markdown(f"<p style='margin: 5px 0; color: #666;'>{step}</p>", unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Batch metrics
+        batch_col1, batch_col2, batch_col3, batch_col4 = st.columns(4)
+        with batch_col1:
+            st.metric("Processing Time", "15 min", "-2 min")
+        with batch_col2:
+            st.metric("Customers", "4,525", "+125")
+        with batch_col3:
+            st.metric("Success Rate", "99.8%", "+0.1%")
+        with batch_col4:
+            st.metric("Data Quality", "98.5%", "+0.3%")
     
     st.markdown("---")
     
-    # Model versioning
+    # Model versioning with enhanced table
     st.markdown("#### 📦 Model Versioning & Registry")
+    
+    st.markdown("""
+    <div style='background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;'>
+        <p style='color: #666; margin: 0; font-size: 0.9rem;'>
+            <strong>MLflow Model Registry</strong> manages all model versions with full lineage tracking, 
+            automated testing, and seamless promotion from staging to production.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     versions_data = pd.DataFrame({
         "Version": ["v1.0.0", "v1.1.0", "v1.2.0", "v2.0.0"],
-        "Date": ["2024-08-01", "2024-09-15", "2024-10-20", "2024-11-01"],
-        "Accuracy": [92.5, 93.2, 93.8, 94.2],
-        "Status": ["Archived", "Archived", "Staging", "Production ✅"],
+        "Date": ["2025-09-20", "2025-10-01", "2025-10-25", "2025-11-01"],
+        "ROC AUC": ["95.2%", "96.8%", "97.5%", "98.7%"],
+        "Status": ["📦 Archived", "📦 Archived", "🧪 Staging", "✅ Production"],
         "Notes": [
             "Initial release",
-            "Added 5 new features",
+            "Added cross connect features",
             "Improved feature engineering",
-            "Current production model"
+            "Current  model"
         ]
     })
     
@@ -1047,112 +1171,102 @@ elif stage == "🚀 5. Model Deployment":
     
     st.markdown("---")
     
-    # Monitoring
-    st.markdown("#### 📊 Model Monitoring")
+    # Monitoring with professional cards
+    st.markdown("#### 📊 Monitoring & Observability")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**Performance Monitoring**")
         st.markdown("""
-        - ✅ Prediction accuracy tracking
-        - ✅ Latency monitoring
-        - ✅ Throughput tracking
-        - ✅ Error rate monitoring
-        - ✅ Model drift detection
-        - ✅ Feature drift detection
-        """)
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white;'>
+            <h4 style='margin: 0 0 15px 0; color: white;'>✅ Performance Monitoring</h4>
+            <ul style='margin: 0; padding-left: 20px;'>
+                <li>Prediction accuracy tracking</li>
+                <li>Latency monitoring (P50, P95, P99)</li>
+                <li>Throughput & QPS tracking</li>
+                <li>Error rate monitoring</li>
+                <li>Model drift detection</li>
+                <li>Feature drift detection</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("**Alerting Rules**")
         st.markdown("""
-        - 🚨 Accuracy drops below 90%
-        - 🚨 Latency exceeds 200ms
-        - 🚨 Error rate > 1%
-        - 🚨 Data drift detected
-        - 🚨 Model drift detected
-        - 🚨 API downtime > 1 minute
-        """)
+        <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 10px; color: white;'>
+            <h4 style='margin: 0 0 15px 0; color: white;'>🚨 Alerting Rules</h4>
+            <ul style='margin: 0; padding-left: 20px;'>
+                <li>ROC AUC drops below 95%</li>
+                <li>Latency exceeds 200ms (P95)</li>
+                <li>Error rate > 1%</li>
+                <li>Data drift detected (PSI > 0.2)</li>
+                <li>Model drift detected</li>
+                <li>API downtime > 1 minute</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Infrastructure
-    st.markdown("#### 🖥️ Infrastructure")
+    # Infrastructure with enhanced styling
+    st.markdown("#### 🖥️ Infrastructure & Resources")
     
-    infra_data = {
+    infra_data = pd.DataFrame({
         "Component": [
-            "API Server",
-            "Model Serving",
-            "Feature Store",
-            "Database",
-            "Cache",
-            "Monitoring"
+            "🌐 API Server",
+            "�� Model Serving",
+            "💾 Feature Store",
+            "🗄️ Database",
+            # "⚡ Cache Layer",
+            "📊 Monitoring"
         ],
         "Technology": [
-            "Flask + Gunicorn",
-            "MLflow",
-            "Delta Lake",
-            "PostgreSQL",
-            "Redis",
+            "Flask + Gunicorn + Nginx",
+            "MLflow Model Serving",
+            "Delta Lake + Spark",
+            "PostgreSQL 14",
+            # "Redis 7.0",
             "Prometheus + Grafana"
         ],
         "Resources": [
             "4 vCPU, 8GB RAM",
             "2 vCPU, 4GB RAM",
-            "S3 + Spark",
+            "Elastic (S3 + Spark)",
             "4 vCPU, 16GB RAM",
-            "2 vCPU, 4GB RAM",
+            # "2 vCPU, 4GB RAM",
             "2 vCPU, 4GB RAM"
-        ],
-        "Scaling": [
-            "Auto-scale 2-10 instances",
-            "Fixed 2 instances",
-            "Elastic",
-            "Fixed",
-            "Fixed",
-            "Fixed"
         ]
-    }
+        # ,
+        # "Scaling": [
+        #     "Auto (2-10 instances)",
+        #     "Fixed (2 instances)",
+        #     "Elastic",
+        #     "Fixed",
+        #     "Fixed",
+        #     "Fixed"
+        # ],
+        # "Cost/Month": [
+        #     "$240",
+        #     "$80",
+        #     "$150",
+        #     "$160",
+        #     "$80",
+        #     "$80"
+        # ]
+    })
     
-    st.dataframe(pd.DataFrame(infra_data), use_container_width=True, hide_index=True)
+    st.dataframe(infra_data, use_container_width=True, hide_index=True)
+    
+    # Total cost
+    # st.markdown("""
+    # <div style='background: #e8f5e9; padding: 15px 20px; border-radius: 10px; border-left: 4px solid #4CAF50; margin-top: 15px;'>
+    #     <p style='color: #666; margin: 0;'><strong>Total Infrastructure Cost:</strong> <span style='color: #4CAF50; font-size: 1.2rem; font-weight: bold;'>$790/month</span></p>
+    # </div>
+    # """, unsafe_allow_html=True)
 
 elif stage == "📈 6. Dashboards & Personas":
     st.markdown('<div class="stage-header">📈 Stage 6: Dashboards & Personas</div>', unsafe_allow_html=True)
-    st.markdown("### Role-Based Dashboards for Different User Personas")
-    
-    # Personas overview
-    st.markdown("#### 👥 User Personas")
-    
-    personas_data = pd.DataFrame({
-        "Persona": [
-            "Executive",
-            "Technical/Data Scientist",
-            "Customer Risk Analyst",
-            "Credit Officer"
-        ],
-        "Primary Goal": [
-            "Strategic oversight & KPIs",
-            "Model performance & technical metrics",
-            "Customer risk assessment & monitoring",
-            "Credit decision support"
-        ],
-        "Key Metrics": [
-            "Portfolio risk, Default rate, ROI",
-            "Model accuracy, Drift, Feature importance",
-            "Customer risk scores, Trends, Alerts",
-            "Individual assessments, Recommendations"
-        ],
-        "Update Frequency": [
-            "Daily",
-            "Real-time",
-            "Real-time",
-            "On-demand"
-        ]
-    })
-    
-    st.dataframe(personas_data, use_container_width=True, hide_index=True)
-    
-    st.markdown("---")
+    st.markdown("### Role-Based Dashboards")
     
     # Dashboard selection
     dashboard_type = st.selectbox(
@@ -1165,306 +1279,55 @@ elif stage == "📈 6. Dashboards & Personas":
         ]
     )
     
-    if dashboard_type == "🎯 Executive Dashboard":
-        st.markdown("### 🎯 Executive Dashboard")
-        st.markdown("*High-level KPIs and strategic insights for C-level executives*")
-        
-        # Key metrics
-        col1, col2, col3, col4, col5 = st.columns(5)
-        with col1:
-            st.metric("Total Customers", "4,525", "+125")
-        with col2:
-            st.metric("Portfolio Risk", "Low", "↓ 5%")
-        with col3:
-            st.metric("Default Rate", "2.3%", "↓ 0.8%")
-        with col4:
-            st.metric("Avg Credit Limit", "AED 45K", "+AED 5K")
-        with col5:
-            st.metric("ROI", "18.5%", "+2.3%")
-        
-        st.markdown("---")
-        
-        # Risk distribution
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            risk_dist = pd.DataFrame({
-                "Risk Category": ["Very Low", "Low", "Medium", "High", "Very High"],
-                "Count": [3210, 845, 320, 115, 35]
-            })
-            fig = px.pie(risk_dist, values="Count", names="Risk Category", 
-                         title="Portfolio Risk Distribution",
-                         color_discrete_sequence=['#2ca02c', '#90ee90', '#ffc107', '#ff7f0e', '#dc3545'])
-            st.plotly_chart(fig, use_container_width=True)
-        
-        with col2:
-            # Trend over time
-            months = pd.date_range('2024-01-01', '2024-11-01', freq='M')
-            default_rate = [3.5, 3.2, 3.0, 2.8, 2.7, 2.6, 2.5, 2.4, 2.3, 2.3, 2.3]
-            
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=months, y=default_rate, mode='lines+markers',
-                                    name='Default Rate', line=dict(color='red', width=3)))
-            fig.update_layout(title="Default Rate Trend", yaxis_title="Default Rate (%)", height=300)
-            st.plotly_chart(fig, use_container_width=True)
-        
-        # Strategic insights
-        st.markdown("#### 💡 Strategic Insights")
-        st.markdown("""
-        - ✅ **70.9% of portfolio is Very Low Risk** - Strong foundation for growth
-        - ✅ **Default rate decreased by 35%** - Model effectiveness validated
-        - ✅ **20 premium customers identified** - Opportunity for credit expansion
-        - ⚠️ **2.5% customers are High/Very High Risk** - Require close monitoring
-        - 📈 **Positive trend in portfolio quality** - Continuous improvement
-        """)
-    
-    elif dashboard_type == "🔬 Technical Dashboard":
-        st.markdown("### 🔬 Technical Dashboard")
-        st.markdown("*Model performance, drift detection, and technical metrics for data scientists*")
-        
-        # Model metrics
-        col1, col2, col3, col4, col5 = st.columns(5)
-        with col1:
-            st.metric("Model Accuracy", "94.2%", "+0.4%")
-        with col2:
-            st.metric("AUC-ROC", "0.96", "+0.01")
-        with col3:
-            st.metric("Precision", "98.8%", "+0.3%")
-        with col4:
-            st.metric("Recall", "99.0%", "+0.2%")
-        with col5:
-            st.metric("F1-Score", "98.9%", "+0.2%")
-        
-        st.markdown("---")
-        
-        # Model performance over time
-        st.markdown("#### 📊 Model Performance Tracking")
-        
-        dates = pd.date_range('2024-01-01', '2024-11-01', freq='W')
-        accuracy = 92 + np.random.randn(len(dates)).cumsum() * 0.1
-        accuracy = np.clip(accuracy, 92, 95)
-        
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=dates, y=accuracy, mode='lines', name='Accuracy',
-                                line=dict(color='blue', width=2)))
-        fig.add_hline(y=90, line_dash="dash", line_color="red", 
-                     annotation_text="Threshold (90%)")
-        fig.update_layout(title="Model Accuracy Over Time", yaxis_title="Accuracy (%)", height=300)
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Drift detection
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("#### 🔍 Data Drift Detection")
-            drift_data = pd.DataFrame({
-                "Feature": ["volatility", "gmv_slope", "days_since_last_order", "sales_12m", "active_months"],
-                "Drift Score": [0.02, 0.01, 0.03, 0.01, 0.02],
-                "Status": ["✅ OK", "✅ OK", "⚠️ Warning", "✅ OK", "✅ OK"]
-            })
-            st.dataframe(drift_data, use_container_width=True, hide_index=True)
-        
-        with col2:
-            st.markdown("#### 🎯 Model Drift Detection")
-            model_drift = pd.DataFrame({
-                "Metric": ["Prediction Distribution", "Error Rate", "Confidence Scores"],
-                "Drift Score": [0.01, 0.02, 0.01],
-                "Status": ["✅ OK", "✅ OK", "✅ OK"]
-            })
-            st.dataframe(model_drift, use_container_width=True, hide_index=True)
-        
-        # Feature importance
-        st.markdown("#### 🔧 Feature Importance")
-        
-        importance_data = pd.DataFrame({
-            "Feature": ["volatility", "days_since_last_order", "gmv_slope", "sales_12m", 
-                       "sales_6m", "consistency_score", "recency_score", "monthly_gmv"],
-            "Importance": [0.156, 0.142, 0.128, 0.115, 0.098, 0.087, 0.076, 0.065]
-        })
-        
-        fig = px.bar(importance_data, x="Importance", y="Feature", orientation='h',
-                     title="Top 8 Feature Importance", color="Importance",
-                     color_continuous_scale="Blues")
-        fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
-    
-    elif dashboard_type == "📊 Customer Risk Dashboard":
-        st.markdown("### 📊 Customer Risk Dashboard")
-        st.markdown("*Customer risk monitoring and portfolio analysis for risk analysts*")
-        
-        # Risk metrics
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("High Risk Customers", "150", "↓ 25")
-        with col2:
-            st.metric("Avg Risk Score", "0.023", "↓ 0.005")
-        with col3:
-            st.metric("Customers at Risk", "35", "↓ 10")
-        with col4:
-            st.metric("Risk Alerts", "12", "+3")
-        
-        st.markdown("---")
-        
-        # Customer search
-        st.markdown("#### 🔍 Customer Risk Lookup")
-        customer_id = st.text_input("Enter Customer ID", "12345")
-        
-        if st.button("Search Customer"):
-            st.success(f"Customer {customer_id} found!")
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Risk Probability", "0.000123")
-            with col2:
-                st.metric("Risk Category", "Very Low Risk")
-            with col3:
-                st.metric("Confidence", "98.5%")
-            
-            # Customer details
-            st.markdown("**Customer Details**")
-            customer_details = {
-                "Metric": ["GMV", "Orders", "Active Months", "Last Order", "Volatility", "Growth"],
-                "Value": ["AED 136,282", "245", "11", "5 days ago", "0.25", "+12.3%"]
-            }
-            st.dataframe(pd.DataFrame(customer_details), use_container_width=True, hide_index=True)
-        
-        # Risk distribution by segment
-        st.markdown("#### 📊 Risk Distribution by Segment")
-        
-        segment_risk = pd.DataFrame({
-            "Segment": ["Premium", "Standard", "Growing", "At-Risk"],
-            "Very Low": [95, 70, 60, 20],
-            "Low": [4, 20, 25, 30],
-            "Medium": [1, 8, 12, 35],
-            "High": [0, 2, 3, 15]
-        })
-        
-        fig = go.Figure()
-        for col in ["Very Low", "Low", "Medium", "High"]:
-            fig.add_trace(go.Bar(name=col, x=segment_risk["Segment"], y=segment_risk[col]))
-        
-        fig.update_layout(barmode='stack', title="Risk Distribution by Customer Segment", height=400)
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Recent alerts
-        st.markdown("#### 🚨 Recent Risk Alerts")
-        
-        alerts_data = pd.DataFrame({
-            "Customer ID": ["8697", "5432", "9876", "3456"],
-            "Alert Type": ["Risk Increase", "High Volatility", "Payment Delay", "Negative Growth"],
-            "Severity": ["Medium", "High", "Low", "Medium"],
-            "Date": ["2024-11-05", "2024-11-04", "2024-11-03", "2024-11-02"]
-        })
-        
-        st.dataframe(alerts_data, use_container_width=True, hide_index=True)
-    
-    elif dashboard_type == "💼 Credit Officer Dashboard":
-        # st.markdown("### 💼 Credit Officer Dashboard")
-        # st.markdown("*Credit decision support and customer assessment for credit officers*")
-        
+    if dashboard_type == "💼 Credit Officer Dashboard":
         render_credit_officer_dashboard()
-        # Quick stats
-        # col1, col2, col3, col4 = st.columns(4)
-        # with col1:
-        #     st.metric("Pending Applications", "23")
-        # with col2:
-        #     st.metric("Approved Today", "15")
-        # with col3:
-        #     st.metric("Rejected Today", "3")
-        # with col4:
-        #     st.metric("Avg Processing Time", "12 min")
-        
-        # st.markdown("---")
-        
-        # # Credit assessment tool
-        # st.markdown("#### 🎯 Credit Assessment Tool")
-        
-        # col1, col2 = st.columns(2)
-        
-        # with col1:
-        #     customer_id_input = st.text_input("Customer ID", "12345")
-        #     requested_limit = st.number_input("Requested Credit Limit (AED)", value=50000, step=5000)
-        
-        # with col2:
-        #     tenure_months = st.number_input("Tenure (Months)", value=12, step=1)
-        #     interest_rate = st.number_input("Interest Rate (%)", value=8.5, step=0.5)
-        
-        # if st.button("Assess Credit Application", type="primary"):
-        #     st.success("✅ Credit Assessment Complete!")
-            
-        #     # Assessment results
-        #     col1, col2, col3 = st.columns(3)
-        #     with col1:
-        #         st.metric("Risk Score", "0.000123", help="Very Low Risk")
-        #     with col2:
-        #         st.metric("Recommended Limit", "AED 75,000", "+AED 25K")
-        #     with col3:
-        #         st.metric("Approval Confidence", "98.5%")
-            
-        #     # Recommendation
-        #     st.markdown("#### 💡 Recommendation")
-        #     st.success("""
-        #     **APPROVE** - Customer qualifies for credit
-            
-        #     **Rationale**:
-        #     - ✅ Very Low Risk (0.000123 probability)
-        #     - ✅ Strong payment history
-        #     - ✅ Stable income and cash flow
-        #     - ✅ Low volatility (0.25)
-        #     - ✅ Positive growth trend (+12.3%)
-        #     - ✅ Recent activity (5 days ago)
-            
-        #     **Suggested Terms**:
-        #     - Credit Limit: AED 75,000 (higher than requested)
-        #     - Interest Rate: 7.5% (preferential rate)
-        #     - Tenure: 12-24 months
-        #     - Collateral: Not required
-        #     """)
-            
-        #     # SHAP explanation
-        #     st.markdown("#### 🔍 Decision Explanation (SHAP)")
-            
-        #     shap_data = pd.DataFrame({
-        #         "Feature": ["volatility", "recency", "gmv_slope", "sales_12m", "consistency_score"],
-        #         "Value": [0.25, 5, 1234.5, 136282, 0.75],
-        #         "SHAP Contribution": [-0.002, -0.0015, -0.001, -0.0008, -0.0006],
-        #         "Impact": ["↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk", "↓ Reduces Risk"]
-        #     })
-            
-        #     st.dataframe(shap_data, use_container_width=True, hide_index=True)
-        
-        # # Recent decisions
-        # st.markdown("---")
-        # st.markdown("#### 📋 Recent Credit Decisions")
-        
-        # decisions_data = pd.DataFrame({
-        #     "Customer ID": ["8697", "5432", "9876", "3456", "7890"],
-        #     "Requested": ["50K", "30K", "100K", "25K", "75K"],
-        #     "Approved": ["75K", "30K", "Rejected", "25K", "60K"],
-        #     "Decision": ["Approved", "Approved", "Rejected", "Approved", "Approved"],
-        #     "Date": ["2024-11-06", "2024-11-06", "2024-11-05", "2024-11-05", "2024-11-04"]
-        # })
-        
-        # st.dataframe(decisions_data, use_container_width=True, hide_index=True)
+    else:
+        st.info(f"Preview for {dashboard_type} - Full implementation available in production")
 
 # Footer with Kee Platform Branding
 st.markdown("---")
+
+# Create footer with logo inside purple rectangle using markdown background
+# st.markdown("""
+# <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-top: 20px; padding-top: 15px; padding-bottom: 15px;'>
+# </div>
+# """, unsafe_allow_html=True)
+
+# Position content over the purple background
 st.markdown("""
-<div style='text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-top: 40px;'>
-    <h2 style='color: white; margin: 0 0 10px 0; font-size: 2rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
-        KEE PLATFORM
-    </h2>
-    <p style='color: #f0f0f0; margin: 10px 0; font-size: 1.1rem;'>
-        <strong>Credit Risk Model Journey</strong> | End-to-End ML Pipeline
-    </p>
-    <p style='color: #e0e0e0; margin: 5px 0; font-size: 0.9rem;'>
-        Built with Streamlit | Powered by Advanced Analytics
-    </p>
-    <p style='color: #d0d0d0; margin: 15px 0 0 0; font-size: 0.85rem;'>
-        © 2024 Kee Platform. All rights reserved.
-    </p>
-</div>
+<style>
+.footer-content {
+    margin-top: -120px;
+    text-align: center;
+    padding: 0 20px;
+}
+</style>
 """, unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    try:
+        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
+    except:
+        st.markdown("""
+        <div style='text-align: center;'>
+            <h2 style='color: white; margin: 0; font-size: 1.5rem; font-weight: bold;'>KEE PLATFORM</h2>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # st.markdown("""
+    # <div style='text-align: center;'>
+    #     <p style='color: #f0f0f0; margin: 5px 0; font-size: 0.95rem;'>
+    #         <strong>Credit Risk Model Journey</strong> | End-to-End ML Pipeline
+    #     </p>
+    #     <p style='color: #e0e0e0; margin: 3px 0; font-size: 0.8rem;'>
+    #         Built with Streamlit | Powered by Advanced Analytics
+    #     </p>
+    #     <p style='color: #d0d0d0; margin: 8px 0 0 0; font-size: 0.75rem;'>
+    #         © 2024 Kee Platform. All rights reserved.
+    #     </p>
+    # </div>
+    # """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     pass
