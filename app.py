@@ -308,16 +308,6 @@ with st.sidebar:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Footer info
-    st.markdown("""
-    <div style='text-align: center; padding: 15px 10px; background: #f8f9fa; border-radius: 8px; margin-top: 20px;'>
-        <p style='color: #666; margin: 0; font-size: 0.7rem;'>
-            <strong>Version</strong> 2.0.1
-        </p>
-        <p style='color: #999; margin: 5px 0 0 0; font-size: 0.65rem;'>
-            Last Updated: June 2025
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
 
 # AI Assistant Response Generator
 def generate_ai_response(query):
@@ -620,11 +610,11 @@ if stage == "🏠 Overview":
     
     stages = [
         ("📥", "Data\nIngestion", "#e3f2fd"),
-        ("📊", "EDA &\nProfiling", "#f3e5f5"),
+        ("📊", "EDA &\n Data Profiling", "#f3e5f5"),
         ("🔧", "Feature\nEngineering", "#e8f5e9"),
         ("🤖", "Model\nTraining", "#fff3e0"),
         ("🚀", "Model\nDeployment", "#fce4ec"),
-        ("📈", "Dashboards\n& Serving", "#e0f2f1")
+        ("📈", "Dashboards\n", "#e0f2f1")
     ]
     
     for i, (col, (icon, name, color)) in enumerate(zip(cols, stages)):
@@ -658,14 +648,14 @@ if stage == "🏠 Overview":
     with col2:
         st.metric("Total Records", "4,525", help="Unique customers analyzed")
     with col3:
-        st.metric("Features Engineered", "32", help="Advanced risk indicators")
+        st.metric("Features Engineered", "58", help="Advanced risk indicators")
     with col4:
         st.metric("Model Accuracy", "98.7%", help="Logistic Regression performance")
     
     st.markdown("---")
     
     # Journey stages overview
-    st.markdown("### 📋 Journey Stages")
+    st.markdown("### 📋 Stages")
     
     stages_data = {
         "Stage": ["1. Data Ingestion", "2. EDA & Profiling", "3. Feature Engineering", 
@@ -675,7 +665,7 @@ if stage == "🏠 Overview":
         "Key Output": [
             "Unified dataset (4,525 customers)",
             "Data quality report & insights",
-            "32 engineered features",
+            "58 engineered features",
             "Trained LR model (98.7% ROC AUC)",
             "REST API + Batch predictions",
             "4 persona-specific dashboards"
@@ -688,36 +678,36 @@ if stage == "🏠 Overview":
     st.markdown("---")
     
     # Key Insights
-    st.markdown("### 💡 Key Insights")
+    # st.markdown("### 💡 Key Insights")
     
-    col1, col2, col3 = st.columns(3)
+    # col1, col2, col3 = st.columns(3)
     
-    with col1:
-        st.markdown("""
-        **Data Integration**
-        - ✅ Integrated 6 diverse data sources
-        - ✅ Processed 4,525 unique customers
-        - ✅ 96.8% data completeness
-        - ✅ Real-time data pipeline
-        """)
+    # with col1:
+    #     st.markdown("""
+    #     **Data Integration**
+    #     - ✅ Integrated 6 diverse data sources
+    #     - ✅ Processed 4,525 unique customers
+    #     - ✅ 96.8% data completeness
+    #     - ✅ Real-time data pipeline
+    #     """)
     
-    with col2:
-        st.markdown("""
-        **Model Performance**
-        - ✅ 98.7% model ROC AUC
-        - ✅ 58 engineered features
-        - ✅ Full explainability with SHAP
-        - ✅ Production-ready deployment
-        """)
+    # with col2:
+    #     st.markdown("""
+    #     **Model Performance**
+    #     - ✅ 98.7% model ROC AUC
+    #     - ✅ 58 engineered features
+    #     - ✅ Full explainability with SHAP
+    #     - ✅ Production-ready deployment
+    #     """)
     
-    with col3:
-        st.markdown("""
-        **Business Value**
-        - ✅ Real-time risk assessment
-        - ✅ 4 persona-specific dashboards
-        - ✅ Automated decision support
-        - ✅ Scalable architecture
-        """)
+    # with col3:
+    #     st.markdown("""
+    #     **Business Value**
+    #     - ✅ Real-time risk assessment
+    #     - ✅ 4 persona-specific dashboards
+    #     - ✅ Automated decision support
+    #     - ✅ Scalable architecture
+    #     """)
 
 elif stage == "📥 1. Data Ingestion":
     st.markdown('<div class="stage-header">📥 Stage 1: Data Ingestion</div>', unsafe_allow_html=True)
