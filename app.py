@@ -2359,8 +2359,8 @@ elif stage == "📈 6. Dashboards":
     elif dashboard_type == "💼 Credit Officer Dashboard":
         render_credit_officer_dashboard()
 
-elif stage == "🤖 AI Assistant":
-    st.markdown('<div class="stage-header">🤖 AI Assistant</div>', unsafe_allow_html=True)
+elif stage == "💬 AI Assistant":
+    st.markdown('<div class="stage-header">💬 AI Assistant</div>', unsafe_allow_html=True)
     st.markdown("### Intelligent Credit Risk Analysis Assistant")
     
     st.markdown("""
