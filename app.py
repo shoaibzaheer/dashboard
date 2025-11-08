@@ -58,7 +58,7 @@ st.markdown("""
 # Sidebar with Kee Platform Logo
 try:
     # Try to load the KEE logo image
-    st.sidebar.image("streamlit_deployment/assets/kee_logo.svg", width=200)
+    st.sidebar.image("assets/kee_logo.svg", width=200)
 except:
     # Fallback to styled text logo if image not found
     st.sidebar.markdown("""
@@ -1349,7 +1349,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     try:
-        st.image("streamlit_deployment/assets/kee_logo.svg", width=100)
+        st.image("assets/kee_logo.svg", width=100)
     except:
         st.markdown("""
         <div style='text-align: center;'>
