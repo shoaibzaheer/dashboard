@@ -644,9 +644,9 @@ if stage == "🏠 Overview":
     # Overview metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Data Sources", "4", help="Distribution Partner, Payment Partner, Bank, AECB")
+        st.metric("Data Sources", "6", help="Distribution Partner, Payment Partner, Bank, AECB")
     with col2:
-        st.metric("Total Records", "4,525", help="Unique customers analyzed")
+        st.metric("Total Records", "24,350", help="Unique customers analyzed")
     with col3:
         st.metric("Features Engineered", "58", help="Advanced risk indicators")
     with col4:
@@ -940,7 +940,7 @@ elif stage == "📊 2. EDA & Data Profiling":
     # Key distributions
     st.markdown("#### 📈 Key Data Distributions")
     
-    tab1, tab2, tab3, tab4 = st.tabs(["GMV Distribution", "Risk Categories", "Customer Segments", "Temporal Patterns"])
+    tab1, tab3, tab4 = st.tabs(["GMV Distribution",  "Customer Segments", "Temporal Patterns"])
     
     with tab1:
         # GMV distribution
@@ -962,28 +962,28 @@ elif stage == "📊 2. EDA & Data Profiling":
         with col3:
             st.metric("Max GMV", "AED 1.9M")
     
-    with tab2:
-        # Risk categories
-        risk_data = pd.DataFrame({
-            "Risk Category": ["Very Low Risk", "Low Risk", "Medium Risk", "High Risk", "Very High Risk"],
-            "Count": [3210, 845, 320, 115, 35],
-            "Percentage": [70.9, 18.7, 7.1, 2.5, 0.8]
-        })
+    # with tab2:
+    #     # Risk categories
+    #     risk_data = pd.DataFrame({
+    #         "Risk Category": ["Very Low Risk", "Low Risk", "Medium Risk", "High Risk", "Very High Risk"],
+    #         "Count": [3210, 845, 320, 115, 35],
+    #         "Percentage": [70.9, 18.7, 7.1, 2.5, 0.8]
+    #     })
         
-        fig = px.bar(risk_data, x="Risk Category", y="Count", 
-                     title="Risk Category Distribution",
-                     color="Risk Category",
-                     color_discrete_map={
-                         "Very Low Risk": "#28a745",
-                         "Low Risk": "#90ee90",
-                         "Medium Risk": "#ffc107",
-                         "High Risk": "#ff7f0e",
-                         "Very High Risk": "#dc3545"
-                     })
-        fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
+    #     fig = px.bar(risk_data, x="Risk Category", y="Count", 
+    #                  title="Risk Category Distribution",
+    #                  color="Risk Category",
+    #                  color_discrete_map={
+    #                      "Very Low Risk": "#28a745",
+    #                      "Low Risk": "#90ee90",
+    #                      "Medium Risk": "#ffc107",
+    #                      "High Risk": "#ff7f0e",
+    #                      "Very High Risk": "#dc3545"
+    #                  })
+    #     fig.update_layout(height=400)
+    #     st.plotly_chart(fig, use_container_width=True)
         
-        st.dataframe(risk_data, use_container_width=True, hide_index=True)
+    #     st.dataframe(risk_data, use_container_width=True, hide_index=True)
     
     with tab3:
         # Customer segments
@@ -996,7 +996,7 @@ elif stage == "📊 2. EDA & Data Profiling":
         fig = px.pie(segment_data, values="Count", names="Segment", 
                      title="Customer Segmentation",
                      hole=0.4)
-        fig.update_layout(height=400)
+        fig.update_layout(height=500)
         st.plotly_chart(fig, use_container_width=True)
         
         st.dataframe(segment_data, use_container_width=True, hide_index=True)
@@ -1043,46 +1043,46 @@ elif stage == "📊 2. EDA & Data Profiling":
     st.markdown("---")
     
     # Key insights
-    st.markdown("#### 💡 Key Insights from EDA")
+    # st.markdown("#### 💡 Key Insights from EDA")
     
     col1, col2 = st.columns(2)
     
-    with col1:
-        st.markdown("**Positive Findings**")
-        st.markdown("""
-        - ✅ 70.9% customers are Very Low Risk
-        - ✅ Strong data quality (96.8% complete)
-        - ✅ No duplicate records
-        - ✅ Clear segmentation patterns
-        - ✅ Positive growth trend in orders
-        - ✅ High AECB coverage (90.6%)
-        """)
+    # with col1:
+    #     st.markdown("**Positive Findings**")
+    #     st.markdown("""
+    #     - ✅ 70.9% customers are Very Low Risk
+    #     - ✅ Strong data quality (96.8% complete)
+    #     - ✅ No duplicate records
+    #     - ✅ Clear segmentation patterns
+    #     - ✅ Positive growth trend in orders
+    #     - ✅ High AECB coverage (90.6%)
+    #     """)
     
-    with col2:
-        st.markdown("**Areas for Improvement**")
-        st.markdown("""
-        - ⚠️ Bank data coverage at 70.7%
-        - ⚠️ High GMV variance (skewed distribution)
-        - ⚠️ 3.2% outliers need investigation
-        - ⚠️ Some missing AECB scores
-        - ⚠️ Seasonal patterns in order volume
-        - ⚠️ 125 inactive customers
-        """)
+    # with col2:
+    #     st.markdown("**Areas for Improvement**")
+    #     st.markdown("""
+    #     - ⚠️ Bank data coverage at 70.7%
+    #     - ⚠️ High GMV variance (skewed distribution)
+    #     - ⚠️ 3.2% outliers need investigation
+    #     - ⚠️ Some missing AECB scores
+    #     - ⚠️ Seasonal patterns in order volume
+    #     - ⚠️ 125 inactive customers
+    #     """)
 
 elif stage == "🔧 3. Feature Engineering":
     st.markdown('<div class="stage-header">🔧 Stage 3: Feature Engineering</div>', unsafe_allow_html=True)
     st.markdown("### Advanced Feature Creation & Selection")
     
     # Feature engineering overview
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Raw Features", "156")
     with col2:
         st.metric("Engineered Features", "58")
     with col3:
         st.metric("Feature Reduction", "62.8%")
-    with col4:
-        st.metric("Model Performance", "+15.7%")
+    # with col4:
+    #     st.metric("Model Performance", "+15.7%")
     
     st.markdown("---")
     
@@ -1119,7 +1119,7 @@ elif stage == "🔧 3. Feature Engineering":
     st.markdown("""
     <div style='background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;'>
         <p style='color: #666; margin: 0; font-size: 0.9rem;'>
-            Features engineered from <strong>6 data sources</strong>: Distribution Partner, Payment Partner (RSPI), 
+            Features engineered from <strong>6 data sources</strong>: Distribution Partner, Payment Partner, 
             Bank Transactions, AECB Credit Bureau, LOS (Loan Origination), and Dewa Bills
         </p>
     </div>
@@ -1307,38 +1307,38 @@ elif stage == "🔧 3. Feature Engineering":
     
     st.dataframe(importance_data, use_container_width=True, hide_index=True)
     
-    st.markdown("---")
+    # st.markdown("---")
     
     # Feature engineering techniques
-    st.markdown("#### 🛠️ Feature Engineering Techniques Applied")
+    # st.markdown("#### 🛠️ Feature Engineering Techniques Applied")
     
-    col1, col2 = st.columns(2)
+    # col1, col2 = st.columns(2)
     
-    with col1:
-        st.markdown("**Transformation Techniques**")
-        st.markdown("""
-        1. **Log Transformation**: For skewed distributions
-           - `sales_3m_log = log(1 + sales_3m)`
-        2. **Polynomial Features**: Capture non-linear relationships
-           - `gmv_slope_squared = gmv_slope²`
-        3. **Interaction Features**: Combine related features
-           - `volatility_x_recency = volatility * days_since_last_order`
-        4. **Normalization**: Scale features to [0, 1]
-           - StandardScaler for all numeric features
-        5. **Binning**: Discretize continuous variables
-           - Risk categories from continuous scores
-        """)
+    # with col1:
+    #     st.markdown("**Transformation Techniques**")
+    #     st.markdown("""
+    #     1. **Log Transformation**: For skewed distributions
+    #        - `sales_3m_log = log(1 + sales_3m)`
+    #     2. **Polynomial Features**: Capture non-linear relationships
+    #        - `gmv_slope_squared = gmv_slope²`
+    #     3. **Interaction Features**: Combine related features
+    #        - `volatility_x_recency = volatility * days_since_last_order`
+    #     4. **Normalization**: Scale features to [0, 1]
+    #        - StandardScaler for all numeric features
+    #     5. **Binning**: Discretize continuous variables
+    #        - Risk categories from continuous scores
+    #     """)
     
-    with col2:
-        st.markdown("**Domain-Specific Features**")
-        st.markdown("""
-        1. **Recency Score**: `1 / (1 + days_since_last_order)`
-        2. **Consistency Score**: `1 - volatility`
-        3. **Engagement Score**: Composite of orders, frequency, recency
-        4. **Growth Score**: Weighted average of MoM growth rates
-        5. **Volatility**: `Std(orders) / Mean(orders)`
-        6. **GMV Slope**: Linear regression coefficient
-        """)
+    # with col2:
+    #     st.markdown("**Domain-Specific Features**")
+    #     st.markdown("""
+    #     1. **Recency Score**: `1 / (1 + days_since_last_order)`
+    #     2. **Consistency Score**: `1 - volatility`
+    #     3. **Engagement Score**: Composite of orders, frequency, recency
+    #     4. **Growth Score**: Weighted average of MoM growth rates
+    #     5. **Volatility**: `Std(orders) / Mean(orders)`
+    #     6. **GMV Slope**: Linear regression coefficient
+    #     """)
 
 
 elif stage == "🤖 4. Model Training":
