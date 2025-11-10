@@ -254,7 +254,7 @@ def render_credit_officer_dashboard():
     
     # TAB 1: Kee Profile with SHAP Analysis
     with tab1:
-        st.markdown("#### 🎯 Customer Kee Profile & SHAP Analysis")
+        st.markdown("#### 🎯 Customer Kee Profile")
         st.markdown("*ML model risk assessment with detailed feature explanations*")
         
         # Kee score display
@@ -287,8 +287,185 @@ def render_credit_officer_dashboard():
         
         st.markdown("---")
         
+        
+        st.markdown("### 💡 Kee Loan Recommendations")
+        
+        # Determine loan recommendation based on risk category
+        kee_score = cust_data['kee_score']
+        
+        # Risk-based loan parameters
+        if kee_score < 0.05:  # Very Low Risk
+            loan_status = "APPROVED"
+            loan_color = "green"
+            recommended_amount = min(int(cust_data['gmv'] * 0.3), 75000)
+            interest_rate = 7.5
+            tenure_months = 6
+            collateral = "Not Required"
+            processing_fee_pct = 1.0
+            loan_message = "✅ Full loan amount approved with preferential terms"
+        elif kee_score < 0.1:  # Low Risk
+            loan_status = "APPROVED"
+            loan_color = "green"
+            recommended_amount = min(int(cust_data['gmv'] * 0.25), 50000)
+            interest_rate = 9.5
+            tenure_months = 6
+            collateral = "Recommended"
+            processing_fee_pct = 1.5
+            loan_message = "✅ Loan approved with standard terms"
+        elif kee_score < 0.5:  # Medium Risk
+            loan_status = "SMALL LOAN OFFERED"
+            loan_color = "orange"
+            recommended_amount = min(int(cust_data['gmv'] * 0.15), 25000)
+            interest_rate = 12.5
+            tenure_months = 4
+            collateral = "Required"
+            processing_fee_pct = 2.0
+            loan_message = "⚠️ Small loan amount offered with strict conditions"
+        elif kee_score < 0.7:  # High Risk
+            loan_status = "NO LOAN"
+            loan_color = "red"
+            recommended_amount = 0
+            interest_rate = None
+            tenure_months = None
+            collateral = "N/A"
+            processing_fee_pct = None
+            loan_message = "❌ Loan not recommended - High risk profile"
+        else:  # Very High Risk
+            loan_status = "NO LOAN"
+            loan_color = "red"
+            recommended_amount = 0
+            interest_rate = None
+            tenure_months = None
+            collateral = "N/A"
+            processing_fee_pct = None
+            loan_message = "❌ Loan rejected - Very high risk profile"
+        
+        # Display loan recommendation
+        if recommended_amount > 0:
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown("**Recommended Loan Amount**")
+                st.markdown(f"<h2 style='color: {loan_color};'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
+                if loan_status == "APPROVED":
+                    st.success(loan_message)
+                else:
+                    st.warning(loan_message)
+            
+            with col2:
+                st.markdown("**Suggested Interest Rate**")
+                st.markdown(f"<h2 style='color: {loan_color};'>{interest_rate}%</h2>", unsafe_allow_html=True)
+                if interest_rate <= 9.5:
+                    st.info("Competitive rate based on risk profile")
+                else:
+                    st.warning("Higher rate due to elevated risk")
+            
+            with col3:
+                st.markdown("**Optimal Tenure**")
+                st.markdown(f"<h2 style='color: {loan_color};'>{tenure_months} months</h2>", unsafe_allow_html=True)
+                if tenure_months >= 6:
+                    st.info("Standard repayment schedule")
+                else:
+                    st.warning("Shorter tenure to mitigate risk")
+            
+            # Loan calculation details
+            st.markdown("---")
+            st.markdown("#### 📊 Loan Calculation Details")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Calculate loan financials
+                total_interest = recommended_amount * (interest_rate / 100) * (tenure_months / 12)
+                total_repayment = recommended_amount + total_interest
+                monthly_installment = total_repayment / tenure_months
+                processing_fee = recommended_amount * (processing_fee_pct / 100)
+                
+                loan_details = pd.DataFrame({
+                    "Parameter": [
+                        "Loan Amount",
+                        "Interest Rate (Annual)",
+                        "Tenure",
+                        "Monthly Installment",
+                        "Total Interest",
+                        "Total Repayment",
+                        "Processing Fee",
+                        "Collateral Required"
+                    ],
+                    "Value": [
+                        f"AED {recommended_amount:,.0f}",
+                        f"{interest_rate}%",
+                        f"{tenure_months} months",
+                        f"AED {monthly_installment:,.0f}",
+                        f"AED {total_interest:,.0f}",
+                        f"AED {total_repayment:,.0f}",
+                        f"AED {processing_fee:,.0f} ({processing_fee_pct}%)",
+                        collateral
+                    ]
+                })
+                st.dataframe(loan_details, use_container_width=True, hide_index=True)
+            
+            with col2:
+                # Debt-to-Income calculation
+                monthly_income = cust_data['avg_monthly_income']
+                existing_obligations = 3400  # From existing loans/cards
+                new_installment = monthly_installment
+                total_obligations = existing_obligations + new_installment
+                dti_ratio = (total_obligations / monthly_income) * 100
+                
+                st.markdown("**Debt-to-Income Analysis**")
+                dti_data = pd.DataFrame({
+                    "Item": [
+                        "Monthly Income",
+                        "Existing Obligations",
+                        "New Loan Installment",
+                        "Total Obligations",
+                        "Debt-to-Income Ratio",
+                        "DTI Status"
+                    ],
+                    "Amount": [
+                        f"AED {monthly_income:,.0f}",
+                        f"AED {existing_obligations:,.0f}",
+                        f"AED {new_installment:,.0f}",
+                        f"AED {total_obligations:,.0f}",
+                        f"{dti_ratio:.1f}%",
+                        "✅ Healthy" if dti_ratio < 40 else "⚠️ High"
+                    ]
+                })
+                st.dataframe(dti_data, use_container_width=True, hide_index=True)
+                
+                if dti_ratio < 40:
+                    st.success(f"✅ DTI ratio of {dti_ratio:.1f}% is within acceptable limits (<40%)")
+                else:
+                    st.warning(f"⚠️ DTI ratio of {dti_ratio:.1f}% exceeds recommended limit")
+        else:
+            # No loan offered - display rejection message
+            st.error(f"""
+            ### ❌ {loan_status}
+            
+            **Reason:** {loan_message}
+            
+            **Risk Assessment:**
+            - Kee Score: {kee_score:.6f} ({risk_category})
+            - Risk Level: Too high for loan approval
+            
+            **Recommendations:**
+            - Build credit history with smaller transactions
+            - Improve business stability and reduce volatility
+            - Reapply after 6-12 months with improved metrics
+            - Consider alternative financing options
+            - Provide additional collateral or guarantor
+            
+            **Alternative Options:**
+            - Trade credit with shorter payment terms
+            - Secured financing with substantial collateral
+            - Co-signer with strong credit profile
+            - Business improvement program enrollment
+            """)
+
+
         # SHAP Feature Analysis - Dynamic based on actual customer data
-        st.markdown("**🔍 SHAP Feature Analysis - Why This Kee Score?**")
+        st.markdown("#### 🔍 SHAP Feature Analysis - Why This Kee Score?")
         st.markdown("*Each feature's contribution to the risk prediction*")
         
         # Extract actual customer values
@@ -298,6 +475,8 @@ def render_credit_officer_dashboard():
         active_mons = cust_data['active_months']
         gmv_val = cust_data['gmv']
         
+        st.markdown("---")
+
         # Calculate SHAP impacts based on actual values and risk level
         # For high-risk customers, features should increase risk (positive SHAP)
         # For low-risk customers, features should decrease risk (negative SHAP)
@@ -475,200 +654,26 @@ def render_credit_officer_dashboard():
         
         st.dataframe(shap_data, use_container_width=True, hide_index=True)
         
-        # SHAP waterfall chart
-        fig = go.Figure(go.Waterfall(
-            name="SHAP",
-            orientation="h",
-            y=shap_data["Feature"],
-            x=shap_data["SHAP Impact"],
-            connector={"line": {"color": "rgb(63, 63, 63)"}},
-            decreasing={"marker": {"color": "green"}},
-            increasing={"marker": {"color": "red"}},
-        ))
-        fig.update_layout(
-            title="SHAP Feature Contributions (Waterfall)",
-            xaxis_title="Impact on Kee Score (Positive = Increases Risk)",
-            height=400
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        # # SHAP waterfall chart
+        # fig = go.Figure(go.Waterfall(
+        #     name="SHAP",
+        #     orientation="h",
+        #     y=shap_data["Feature"],
+        #     x=shap_data["SHAP Impact"],
+        #     connector={"line": {"color": "rgb(63, 63, 63)"}},
+        #     decreasing={"marker": {"color": "green"}},
+        #     increasing={"marker": {"color": "red"}},
+        # ))
+        # fig.update_layout(
+        #     title="SHAP Feature Contributions (Waterfall)",
+        #     xaxis_title="Impact on Kee Score (Positive = Increases Risk)",
+        #     height=400
+        # )
+        # st.plotly_chart(fig, use_container_width=True)
 
-        # Loan Recommendations Section - Dynamic based on Risk Level
-        st.markdown("---")
-        st.markdown("### 💡 Kee Loan Recommendations")
+        # # Loan Recommendations Section - Dynamic based on Risk Level
+        # st.markdown("---")
         
-        # Determine loan recommendation based on risk category
-        kee_score = cust_data['kee_score']
-        
-        # Risk-based loan parameters
-        if kee_score < 0.05:  # Very Low Risk
-            loan_status = "APPROVED"
-            loan_color = "green"
-            recommended_amount = min(int(cust_data['gmv'] * 0.3), 75000)
-            interest_rate = 7.5
-            tenure_months = 6
-            collateral = "Not Required"
-            processing_fee_pct = 1.0
-            loan_message = "✅ Full loan amount approved with preferential terms"
-        elif kee_score < 0.1:  # Low Risk
-            loan_status = "APPROVED"
-            loan_color = "green"
-            recommended_amount = min(int(cust_data['gmv'] * 0.25), 50000)
-            interest_rate = 9.5
-            tenure_months = 6
-            collateral = "Recommended"
-            processing_fee_pct = 1.5
-            loan_message = "✅ Loan approved with standard terms"
-        elif kee_score < 0.5:  # Medium Risk
-            loan_status = "SMALL LOAN OFFERED"
-            loan_color = "orange"
-            recommended_amount = min(int(cust_data['gmv'] * 0.15), 25000)
-            interest_rate = 12.5
-            tenure_months = 4
-            collateral = "Required"
-            processing_fee_pct = 2.0
-            loan_message = "⚠️ Small loan amount offered with strict conditions"
-        elif kee_score < 0.7:  # High Risk
-            loan_status = "NO LOAN"
-            loan_color = "red"
-            recommended_amount = 0
-            interest_rate = None
-            tenure_months = None
-            collateral = "N/A"
-            processing_fee_pct = None
-            loan_message = "❌ Loan not recommended - High risk profile"
-        else:  # Very High Risk
-            loan_status = "NO LOAN"
-            loan_color = "red"
-            recommended_amount = 0
-            interest_rate = None
-            tenure_months = None
-            collateral = "N/A"
-            processing_fee_pct = None
-            loan_message = "❌ Loan rejected - Very high risk profile"
-        
-        # Display loan recommendation
-        if recommended_amount > 0:
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.markdown("**Recommended Loan Amount**")
-                st.markdown(f"<h2 style='color: {loan_color};'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
-                if loan_status == "APPROVED":
-                    st.success(loan_message)
-                else:
-                    st.warning(loan_message)
-            
-            with col2:
-                st.markdown("**Suggested Interest Rate**")
-                st.markdown(f"<h2 style='color: {loan_color};'>{interest_rate}%</h2>", unsafe_allow_html=True)
-                if interest_rate <= 9.5:
-                    st.info("Competitive rate based on risk profile")
-                else:
-                    st.warning("Higher rate due to elevated risk")
-            
-            with col3:
-                st.markdown("**Optimal Tenure**")
-                st.markdown(f"<h2 style='color: {loan_color};'>{tenure_months} months</h2>", unsafe_allow_html=True)
-                if tenure_months >= 6:
-                    st.info("Standard repayment schedule")
-                else:
-                    st.warning("Shorter tenure to mitigate risk")
-            
-            # Loan calculation details
-            st.markdown("---")
-            st.markdown("#### 📊 Loan Calculation Details")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # Calculate loan financials
-                total_interest = recommended_amount * (interest_rate / 100) * (tenure_months / 12)
-                total_repayment = recommended_amount + total_interest
-                monthly_installment = total_repayment / tenure_months
-                processing_fee = recommended_amount * (processing_fee_pct / 100)
-                
-                loan_details = pd.DataFrame({
-                    "Parameter": [
-                        "Loan Amount",
-                        "Interest Rate (Annual)",
-                        "Tenure",
-                        "Monthly Installment",
-                        "Total Interest",
-                        "Total Repayment",
-                        "Processing Fee",
-                        "Collateral Required"
-                    ],
-                    "Value": [
-                        f"AED {recommended_amount:,.0f}",
-                        f"{interest_rate}%",
-                        f"{tenure_months} months",
-                        f"AED {monthly_installment:,.0f}",
-                        f"AED {total_interest:,.0f}",
-                        f"AED {total_repayment:,.0f}",
-                        f"AED {processing_fee:,.0f} ({processing_fee_pct}%)",
-                        collateral
-                    ]
-                })
-                st.dataframe(loan_details, use_container_width=True, hide_index=True)
-            
-            with col2:
-                # Debt-to-Income calculation
-                monthly_income = cust_data['avg_monthly_income']
-                existing_obligations = 3400  # From existing loans/cards
-                new_installment = monthly_installment
-                total_obligations = existing_obligations + new_installment
-                dti_ratio = (total_obligations / monthly_income) * 100
-                
-                st.markdown("**Debt-to-Income Analysis**")
-                dti_data = pd.DataFrame({
-                    "Item": [
-                        "Monthly Income",
-                        "Existing Obligations",
-                        "New Loan Installment",
-                        "Total Obligations",
-                        "Debt-to-Income Ratio",
-                        "DTI Status"
-                    ],
-                    "Amount": [
-                        f"AED {monthly_income:,.0f}",
-                        f"AED {existing_obligations:,.0f}",
-                        f"AED {new_installment:,.0f}",
-                        f"AED {total_obligations:,.0f}",
-                        f"{dti_ratio:.1f}%",
-                        "✅ Healthy" if dti_ratio < 40 else "⚠️ High"
-                    ]
-                })
-                st.dataframe(dti_data, use_container_width=True, hide_index=True)
-                
-                if dti_ratio < 40:
-                    st.success(f"✅ DTI ratio of {dti_ratio:.1f}% is within acceptable limits (<40%)")
-                else:
-                    st.warning(f"⚠️ DTI ratio of {dti_ratio:.1f}% exceeds recommended limit")
-        else:
-            # No loan offered - display rejection message
-            st.error(f"""
-            ### ❌ {loan_status}
-            
-            **Reason:** {loan_message}
-            
-            **Risk Assessment:**
-            - Kee Score: {kee_score:.6f} ({risk_category})
-            - Risk Level: Too high for loan approval
-            
-            **Recommendations:**
-            - Build credit history with smaller transactions
-            - Improve business stability and reduce volatility
-            - Reapply after 6-12 months with improved metrics
-            - Consider alternative financing options
-            - Provide additional collateral or guarantor
-            
-            **Alternative Options:**
-            - Trade credit with shorter payment terms
-            - Secured financing with substantial collateral
-            - Co-signer with strong credit profile
-            - Business improvement program enrollment
-            """)
-
         
         # Final Recommendation
         st.markdown("---")
@@ -1269,7 +1274,7 @@ def render_credit_officer_dashboard():
     # TAB 6: Bank LOS Documents
     with tab6:
         st.markdown("#### 📄 Bank LOS (Loan Origination System) Documents")
-        st.markdown("*Employment verification and KYC documentation*")
+        st.markdown("*Customer verification and KYB documentation*")
         
         # Document verification status
         col1, col2, col3 = st.columns(3)
@@ -1277,7 +1282,7 @@ def render_credit_officer_dashboard():
             st.markdown("**Document Verification**")
             st.markdown("✅ **Complete**")
         with col2:
-            st.markdown("**KYC Status**")
+            st.markdown("**KYB Status**")
             st.markdown("✅ **Approved**")
         with col3:
             st.markdown("**Last Updated**")
