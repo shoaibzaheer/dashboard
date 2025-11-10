@@ -256,18 +256,18 @@ def render_credit_officer_dashboard():
         with col1:
             st.metric("Kee Score", f"{cust_data['kee_score_scaled']:.1f}/10", help="Credit score: 10 (lowest risk/best) to 1 (highest risk/worst)")
         with col2:
-            # Determine risk category based on Kee Score (lower = better)
-            kee_score = cust_data['kee_score']
-            if kee_score < 0.05:
+            # Determine risk category based on Kee Score (scaled 1-10, higher = better)
+            kee_score_scaled = cust_data['kee_score_scaled']
+            if kee_score_scaled >= 8:
                 risk_category = "Very Low Risk"
                 risk_color = "green"
-            elif kee_score < 0.1:
+            elif kee_score_scaled >= 6:
                 risk_category = "Low Risk"
                 risk_color = "lightgreen"
-            elif kee_score < 0.5:
+            elif kee_score_scaled >= 4:
                 risk_category = "Medium Risk"
                 risk_color = "orange"
-            elif kee_score < 0.7:
+            elif kee_score_scaled >= 2:
                 risk_category = "High Risk"
                 risk_color = "darkorange"
             else:
