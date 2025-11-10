@@ -85,24 +85,34 @@ def render_credit_officer_dashboard():
             if dashboard_df is None:
                 raise FileNotFoundError("dashboard_data.csv not found in any expected location")
             
-            # Load conektr data for customer names
+            # Try to load conektr data for customer names (optional)
             conektr_df = None
             for path in conektr_paths:
                 if os.path.exists(path):
-                    conektr_df = pd.read_csv(path)
-                    break
+                    try:
+                        conektr_df = pd.read_csv(path)
+                        break
+                    except:
+                        pass  # File might be too large or corrupted
             
-            if conektr_df is None:
-                raise FileNotFoundError("data/conektr_data.csv not found in any expected location")
-            
-            # Get unique customers with their outlet names
-            customer_names = conektr_df.groupby('customer_id')['Outlet Name'].first().reset_index()
-            
-            # Merge with dashboard data
-            merged_df = dashboard_df.merge(customer_names, on='customer_id', how='left')
-            
-            # Remove customers with missing outlet names
-            merged_df = merged_df[merged_df['Outlet Name'].notna()]
+            # If conektr data is available, merge it
+            if conektr_df is not None:
+                # Get unique customers with their outlet names
+                customer_names = conektr_df.groupby('customer_id')['Outlet Name'].first().reset_index()
+                
+                # Merge with dashboard data
+                merged_df = dashboard_df.merge(customer_names, on='customer_id', how='left')
+                
+                # Remove customers with missing outlet names
+                merged_df = merged_df[merged_df['Outlet Name'].notna()]
+            else:
+                # Use dashboard data only and create synthetic outlet names
+                merged_df = dashboard_df.copy()
+                if 'Outlet Name' not in merged_df.columns:
+                    # Create outlet names from customer IDs
+                    merged_df['Outlet Name'] = merged_df['customer_id'].apply(
+                        lambda x: f"Customer {x}"
+                    )
             
             return merged_df
         except Exception as e:
