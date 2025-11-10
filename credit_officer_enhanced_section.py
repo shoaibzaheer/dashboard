@@ -58,11 +58,42 @@ def render_credit_officer_dashboard():
     def load_all_customers():
         """Load all customers from CSV files"""
         try:
-            # Load dashboard data for metrics
-            dashboard_df = pd.read_csv('dashboard_data.csv')
+            import os
+            # Get the directory where this script is located
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            
+            # Try multiple possible paths for the CSV files
+            dashboard_paths = [
+                'dashboard_data.csv',  # Current directory
+                os.path.join(script_dir, 'dashboard_data.csv'),  # Script directory
+                os.path.join(script_dir, '..', 'dashboard_data.csv'),  # Parent directory
+            ]
+            
+            conektr_paths = [
+                'data/conektr_data.csv',  # Current directory
+                os.path.join(script_dir, 'data', 'conektr_data.csv'),  # Script directory
+                os.path.join(script_dir, '..', 'data', 'conektr_data.csv'),  # Parent directory
+            ]
+            
+            # Load dashboard data
+            dashboard_df = None
+            for path in dashboard_paths:
+                if os.path.exists(path):
+                    dashboard_df = pd.read_csv(path)
+                    break
+            
+            if dashboard_df is None:
+                raise FileNotFoundError("dashboard_data.csv not found in any expected location")
             
             # Load conektr data for customer names
-            conektr_df = pd.read_csv('data/conektr_data.csv')
+            conektr_df = None
+            for path in conektr_paths:
+                if os.path.exists(path):
+                    conektr_df = pd.read_csv(path)
+                    break
+            
+            if conektr_df is None:
+                raise FileNotFoundError("data/conektr_data.csv not found in any expected location")
             
             # Get unique customers with their outlet names
             customer_names = conektr_df.groupby('customer_id')['Outlet Name'].first().reset_index()
