@@ -53,31 +53,138 @@ def render_credit_officer_dashboard():
     # Customer Selection
     st.markdown("#### 🔍 Customer Selection")
     
-    # Sample customer list
-    customers = {
-        "12345 - Ahmed Al Mansoori": "12345",
-        "23456 - Fatima Al Zaabi": "23456",
-        "34567 - Mohammed Al Hashimi": "34567",
-        "45678 - Sara Al Mazrouei": "45678",
-        "56789 - Ali Al Ketbi": "56789"
-    }
+    # Load customer data from CSV files
+    @st.cache_data
+    def load_all_customers():
+        """Load all customers from CSV files"""
+        try:
+            # Load dashboard data for metrics
+            dashboard_df = pd.read_csv('dashboard_data.csv')
+            
+            # Load conektr data for customer names
+            conektr_df = pd.read_csv('data/conektr_data.csv')
+            
+            # Get unique customers with their outlet names
+            customer_names = conektr_df.groupby('customer_id')['Outlet Name'].first().reset_index()
+            
+            # Merge with dashboard data
+            merged_df = dashboard_df.merge(customer_names, on='customer_id', how='left')
+            
+            # Remove customers with missing outlet names
+            merged_df = merged_df[merged_df['Outlet Name'].notna()]
+            
+            return merged_df
+        except Exception as e:
+            st.error(f"Could not load customer data: {str(e)}")
+            return None
     
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        selected_customer = st.selectbox(
-            "Select Customer",
-            options=list(customers.keys()),
-            help="Choose a customer to view their complete profile"
-        )
-        customer_id = customers[selected_customer]
+    customer_df = load_all_customers()
     
-    with col2:
-        requested_limit = st.number_input(
-            "Requested Credit Limit (AED)",
-            value=50000,
-            step=5000,
-            help="Amount requested by customer"
-        )
+    if customer_df is not None and len(customer_df) > 0:
+        # Create customer dropdown options with real outlet names
+        customer_df['display_name'] = customer_df['customer_id'].astype(str) + " - " + customer_df['Outlet Name'].astype(str)
+        customer_options = customer_df['display_name'].tolist()
+        
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            selected_display = st.selectbox(
+                "Select Customer",
+                options=customer_options,
+                help="Choose a customer to view their complete profile"
+            )
+            
+            # Get customer ID from selection
+            customer_id = selected_display.split(" - ")[0]
+            
+            # Get customer row data
+            cust_row = customer_df[customer_df['customer_id'].astype(str) == customer_id].iloc[0]
+            
+            # Build customer data dictionary from CSV
+            # Use account_value as GMV proxy, calculate orders from active months
+            account_val = float(cust_row.get('account_value', 0))
+            active_mons = max(4, int(cust_row.get('active_months', 4)))  # Ensure at least 4 months if customer exists
+            days_since = int(cust_row.get('days_since_last_order', 30))
+            
+            # Get raw Kee score first for GMV/orders calculation
+            raw_kee_score = float(cust_row.get('risk_score_30d', 0.001))
+            
+            # Estimate GMV and orders based on account value and activity (more realistic ranges)
+            # Adjust based on risk level - high risk customers have lower GMV/orders
+            if raw_kee_score >= 0.7:  # Very High Risk
+                estimated_gmv = max(account_val * 500, np.random.uniform(15000, 50000))
+                estimated_orders = max(active_mons * 5, np.random.randint(20, 60))
+            elif raw_kee_score >= 0.5:  # High Risk
+                estimated_gmv = max(account_val * 700, np.random.uniform(25000, 80000))
+                estimated_orders = max(active_mons * 8, np.random.randint(30, 100))
+            elif raw_kee_score >= 0.1:  # Medium Risk
+                estimated_gmv = max(account_val * 900, np.random.uniform(40000, 150000))
+                estimated_orders = max(active_mons * 12, np.random.randint(50, 150))
+            else:  # Low to Very Low Risk
+                estimated_gmv = max(account_val * 1000, np.random.uniform(80000, 250000))
+                estimated_orders = max(active_mons * 15, np.random.randint(80, 200))
+            
+            # Scale Kee score to 1-10 range (10 = lowest risk, 1 = highest risk)
+            # Invert so higher score = lower risk (like credit scores)
+            kee_score_scaled = min(10, max(1, 10 - (raw_kee_score * 100)))
+            
+            # Determine AECB score based on risk level (inverse relationship)
+            # High Kee score (high risk) = Low AECB score
+            if raw_kee_score >= 0.7:  # Very High Risk
+                aecb_score = int(np.random.uniform(500, 600))
+            elif raw_kee_score >= 0.5:  # High Risk
+                aecb_score = int(np.random.uniform(580, 650))
+            elif raw_kee_score >= 0.1:  # Medium Risk
+                aecb_score = int(np.random.uniform(640, 720))
+            elif raw_kee_score >= 0.05:  # Low Risk
+                aecb_score = int(np.random.uniform(710, 800))
+            else:  # Very Low Risk
+                aecb_score = int(np.random.uniform(780, 850))
+            
+            cust_data = {
+                "gmv": round(estimated_gmv, 2),
+                "gmv_change": f"+{np.random.uniform(5, 20):.1f}%",
+                "orders": estimated_orders,
+                "orders_change": f"+{np.random.randint(1, 30)}",
+                "active_months": active_mons,
+                "last_order": f"{days_since} days ago",
+                "avg_order": estimated_gmv / max(estimated_orders, 1),
+                "order_freq": f"{estimated_orders / max(active_mons, 1):.1f} orders/month",
+                "category": np.random.choice(["Electronics", "Fashion", "Home & Garden", "Beauty", "Sports", "Food"]),
+                "since": f"{np.random.choice(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'])} {np.random.choice([2022, 2023])}",
+                "volatility": f"{cust_row.get('volatility', 0):.2f} ({'Low' if cust_row.get('volatility', 0) < 0.3 else 'Medium' if cust_row.get('volatility', 0) < 0.5 else 'High'})",
+                "growth": f"+{cust_row.get('gmv_slope', 0) * 100:.1f}%",
+                "kee_score": raw_kee_score,  # Keep original for logic
+                "kee_score_scaled": kee_score_scaled,  # Display scaled version
+                "bank_balance": int(np.random.uniform(20000, 100000)),
+                "avg_monthly_income": int(np.random.uniform(12000, 35000)),
+                "avg_expenses": int(np.random.uniform(8000, 20000)),
+                "aecb_score": aecb_score,  # Risk-adjusted AECB score
+                "credit_cards": np.random.randint(1, 4),
+                "loans": np.random.randint(0, 3),
+                "dewa_avg": int(np.random.uniform(600, 1200))
+            }
+            
+            # Set selected_customer variable
+            selected_customer = selected_display
+        
+        with col2:
+            # Search functionality
+            search_id = st.text_input("🔍 Search by ID", placeholder="Enter customer ID")
+            if search_id and search_id in customer_df['customer_id'].astype(str).values:
+                st.success(f"Found: {search_id}")
+    else:
+        st.error("No customer data available")
+        # Fallback to sample data
+        customer_id = "12345"
+        selected_customer = "12345 - Sample Customer"
+        cust_data = {
+            "gmv": 136282, "gmv_change": "+12.3%", "orders": 245, "orders_change": "+8",
+            "active_months": 11, "last_order": "5 days ago", "avg_order": 556,
+            "order_freq": "22.3 orders/month", "category": "Electronics", "since": "Jan 2023",
+            "volatility": "0.25 (Low)", "growth": "+12.3%", "kee_score": 0.000123,
+            "bank_balance": 45230, "avg_monthly_income": 18500, "avg_expenses": 12400,
+            "aecb_score": 785, "credit_cards": 2, "loans": 1, "dewa_avg": 850
+        }
     
     st.markdown("---")
     
@@ -87,8 +194,8 @@ def render_credit_officer_dashboard():
     
     # Create tabs for different data sources
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 Distribution Partner Data",
         "🎯 Kee Profile",
+        "📊 Distribution Partner Data",
         "🏦 Bank Statements",
         "📈 AECB Score",
         "⚡ DEWA Bills",
@@ -96,21 +203,262 @@ def render_credit_officer_dashboard():
     ])
 
     
-    # TAB 1: Conektr Transaction Data
+    # TAB 1: Kee Profile with SHAP Analysis
     with tab1:
+        st.markdown("#### 🎯 Customer Kee Profile & SHAP Analysis")
+        st.markdown("*ML model risk assessment with detailed feature explanations*")
+        
+        # Kee score display
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Kee Score", f"{cust_data['kee_score_scaled']:.1f}/10", help="Credit score: 10 (lowest risk/best) to 1 (highest risk/worst)")
+        with col2:
+            # Determine risk category based on Kee Score (lower = better)
+            kee_score = cust_data['kee_score']
+            if kee_score < 0.05:
+                risk_category = "Very Low Risk"
+                risk_color = "green"
+            elif kee_score < 0.1:
+                risk_category = "Low Risk"
+                risk_color = "lightgreen"
+            elif kee_score < 0.5:
+                risk_category = "Medium Risk"
+                risk_color = "orange"
+            elif kee_score < 0.7:
+                risk_category = "High Risk"
+                risk_color = "darkorange"
+            else:
+                risk_category = "Very High Risk"
+                risk_color = "red"
+            
+            st.markdown(f"**Risk Category**")
+            st.markdown(f"<h3 style='color: {risk_color};'>{risk_category}</h3>", unsafe_allow_html=True)
+        with col3:
+            st.metric("Confidence", "98.5%", help="Model confidence level")
+        
+        st.markdown("---")
+        
+        # SHAP Feature Analysis - Dynamic based on actual customer data
+        st.markdown("**🔍 SHAP Feature Analysis - Why This Kee Score?**")
+        st.markdown("*Each feature's contribution to the risk prediction*")
+        
+        # Extract actual customer values
+        volatility_val = float(cust_row.get('volatility', 0.5))
+        days_since = int(cust_row.get('days_since_last_order', 30))
+        gmv_slope = float(cust_row.get('gmv_slope', 0))
+        active_mons = cust_data['active_months']
+        gmv_val = cust_data['gmv']
+        
+        # Calculate SHAP impacts based on actual values and risk level
+        # For high-risk customers, features should increase risk (positive SHAP)
+        # For low-risk customers, features should decrease risk (negative SHAP)
+        
+        # Base SHAP calculation - adjust based on feature quality
+        base_impact = kee_score / 8  # Distribute the score across features
+        
+        # Volatility impact (high volatility = increases risk)
+        if volatility_val > 0.5:
+            volatility_shap = base_impact * 1.5
+            volatility_effect = "↑ Increases Risk"
+            volatility_explain = "High volatility indicates unstable business"
+        elif volatility_val > 0.3:
+            volatility_shap = base_impact * 0.5
+            volatility_effect = "↑ Slight Risk Increase"
+            volatility_explain = "Moderate volatility shows some instability"
+        else:
+            volatility_shap = -base_impact * 0.8
+            volatility_effect = "↓ Reduces Risk"
+            volatility_explain = "Low volatility indicates stable business"
+        
+        # Days since last order (recent = reduces risk)
+        if days_since > 60:
+            days_shap = base_impact * 1.2
+            days_effect = "↑ Increases Risk"
+            days_explain = "Long gap since last order is concerning"
+        elif days_since > 30:
+            days_shap = base_impact * 0.3
+            days_effect = "↑ Slight Risk Increase"
+            days_explain = "Moderate gap shows reduced engagement"
+        else:
+            days_shap = -base_impact * 0.7
+            days_effect = "↓ Reduces Risk"
+            days_explain = "Recent activity shows engagement"
+        
+        # GMV Slope (positive growth = reduces risk)
+        if gmv_slope < -500:
+            gmv_slope_shap = base_impact * 1.3
+            gmv_slope_effect = "↑ Increases Risk"
+            gmv_slope_explain = "Negative growth trend is concerning"
+        elif gmv_slope < 0:
+            gmv_slope_shap = base_impact * 0.4
+            gmv_slope_effect = "↑ Slight Risk Increase"
+            gmv_slope_explain = "Declining trend shows weakness"
+        else:
+            gmv_slope_shap = -base_impact * 0.6
+            gmv_slope_effect = "↓ Reduces Risk"
+            gmv_slope_explain = "Positive growth trend is favorable"
+        
+        # Sales volume (high GMV = reduces risk)
+        if gmv_val > 100000:
+            sales_shap = -base_impact * 0.9
+            sales_effect = "↓ Reduces Risk"
+            sales_explain = "High sales volume reduces risk"
+        elif gmv_val > 50000:
+            sales_shap = -base_impact * 0.4
+            sales_effect = "↓ Slight Risk Reduction"
+            sales_explain = "Moderate sales provide some stability"
+        else:
+            sales_shap = base_impact * 0.6
+            sales_effect = "↑ Increases Risk"
+            sales_explain = "Low sales volume increases risk"
+        
+        # Consistency score (derived from volatility)
+        consistency_val = 1 - volatility_val
+        if consistency_val > 0.7:
+            consistency_shap = -base_impact * 0.5
+            consistency_effect = "↓ Reduces Risk"
+            consistency_explain = "Consistent behavior is positive"
+        elif consistency_val > 0.5:
+            consistency_shap = -base_impact * 0.2
+            consistency_effect = "↓ Slight Risk Reduction"
+            consistency_explain = "Moderate consistency is acceptable"
+        else:
+            consistency_shap = base_impact * 0.7
+            consistency_effect = "↑ Increases Risk"
+            consistency_explain = "Inconsistent behavior is concerning"
+        
+        # Active months (longer tenure = reduces risk)
+        if active_mons >= 12:
+            active_shap = -base_impact * 0.6
+            active_effect = "↓ Reduces Risk"
+            active_explain = "Long tenure indicates stability"
+        elif active_mons >= 6:
+            active_shap = -base_impact * 0.3
+            active_effect = "↓ Slight Risk Reduction"
+            active_explain = "Moderate tenure shows commitment"
+        else:
+            active_shap = base_impact * 0.5
+            active_effect = "↑ Increases Risk"
+            active_explain = "Short tenure increases uncertainty"
+        
+        # Order frequency
+        order_freq = cust_data['orders'] / max(active_mons, 1)
+        if order_freq > 20:
+            freq_shap = -base_impact * 0.4
+            freq_effect = "↓ Reduces Risk"
+            freq_explain = "Regular orders show reliability"
+        elif order_freq > 10:
+            freq_shap = -base_impact * 0.2
+            freq_effect = "↓ Slight Risk Reduction"
+            freq_explain = "Moderate order frequency is acceptable"
+        else:
+            freq_shap = base_impact * 0.4
+            freq_effect = "↑ Increases Risk"
+            freq_explain = "Low order frequency is concerning"
+        
+        # Recency score (inverse of days since)
+        recency_score = max(0, 1 - (days_since / 90))
+        if recency_score > 0.8:
+            recency_shap = -base_impact * 0.3
+            recency_effect = "↓ Reduces Risk"
+            recency_explain = "Recent transactions are positive"
+        elif recency_score > 0.5:
+            recency_shap = -base_impact * 0.1
+            recency_effect = "↓ Slight Risk Reduction"
+            recency_explain = "Moderate recency is acceptable"
+        else:
+            recency_shap = base_impact * 0.5
+            recency_effect = "↑ Increases Risk"
+            recency_explain = "Lack of recent activity is concerning"
+        
+        shap_data = pd.DataFrame({
+            "Feature": [
+                "Volatility",
+                "Days Since Last Order",
+                "GMV Slope (Growth)",
+                "Sales Last 12 Months",
+                "Consistency Score",
+                "Active Months",
+                "Order Frequency",
+                "Recency Score"
+            ],
+            "Value": [
+                f"{volatility_val:.2f}",
+                f"{days_since} days",
+                f"AED {gmv_slope:.1f}/month",
+                f"AED {gmv_val:,.0f}",
+                f"{consistency_val:.2f}",
+                f"{active_mons} months",
+                f"{order_freq:.1f}/month",
+                f"{recency_score:.2f}"
+            ],
+            "SHAP Impact": [
+                volatility_shap,
+                days_shap,
+                gmv_slope_shap,
+                sales_shap,
+                consistency_shap,
+                active_shap,
+                freq_shap,
+                recency_shap
+            ],
+            "Effect": [
+                volatility_effect,
+                days_effect,
+                gmv_slope_effect,
+                sales_effect,
+                consistency_effect,
+                active_effect,
+                freq_effect,
+                recency_effect
+            ],
+            "Explanation": [
+                volatility_explain,
+                days_explain,
+                gmv_slope_explain,
+                sales_explain,
+                consistency_explain,
+                active_explain,
+                freq_explain,
+                recency_explain
+            ]
+        })
+        
+        st.dataframe(shap_data, use_container_width=True, hide_index=True)
+        
+        # SHAP waterfall chart
+        fig = go.Figure(go.Waterfall(
+            name="SHAP",
+            orientation="h",
+            y=shap_data["Feature"],
+            x=shap_data["SHAP Impact"],
+            connector={"line": {"color": "rgb(63, 63, 63)"}},
+            decreasing={"marker": {"color": "green"}},
+            increasing={"marker": {"color": "red"}},
+        ))
+        fig.update_layout(
+            title="SHAP Feature Contributions (Waterfall)",
+            xaxis_title="Impact on Kee Score (Positive = Increases Risk)",
+            height=400
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    
+    # TAB 2: Distribution Partner Transaction Data
+    with tab2:
         st.markdown("#### 📊 Distribution Partner Transaction Data")
         st.markdown("*Transaction history and business performance metrics*")
         
         # Key metrics
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total GMV", "AED 136,282", "+12.3%")
+            st.metric("Total GMV", f"AED {cust_data['gmv']:,}", cust_data['gmv_change'])
         with col2:
-            st.metric("Total Orders", "245", "+8")
+            st.metric("Total Orders", str(cust_data['orders']), cust_data['orders_change'])
         with col3:
-            st.metric("Active Months", "11", "")
+            st.metric("Active Months", str(cust_data['active_months']), "")
         with col4:
-            st.metric("Last Order", "5 days ago", "")
+            st.metric("Last Order", cust_data['last_order'], "")
         
         st.markdown("---")
         
@@ -129,12 +477,12 @@ def render_credit_officer_dashboard():
                     "Growth Rate (3M)"
                 ],
                 "Value": [
-                    "AED 556",
-                    "22.3 orders/month",
-                    "Electronics",
-                    "Jan 2023",
-                    "0.25 (Low)",
-                    "+12.3%"
+                    f"AED {cust_data['avg_order']}",
+                    cust_data['order_freq'],
+                    cust_data['category'],
+                    cust_data['since'],
+                    cust_data['volatility'],
+                    cust_data['growth']
                 ]
             })
             st.dataframe(trans_data, use_container_width=True, hide_index=True)
@@ -162,83 +510,6 @@ def render_credit_officer_dashboard():
             st.plotly_chart(fig, use_container_width=True)
 
     
-    # TAB 2: Kee Profile with SHAP Analysis
-    with tab2:
-        st.markdown("#### 🎯 Customer Kee Profile & SHAP Analysis")
-        st.markdown("*ML model risk assessment with detailed feature explanations*")
-        
-        # Kee score display
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Kee Score", "0.000123", help="Probability of default")
-        with col2:
-            risk_category = "Very Low Risk"
-            st.markdown(f"**Risk Category**")
-            st.markdown(f"<h3 style='color: green;'>{risk_category}</h3>", unsafe_allow_html=True)
-        with col3:
-            st.metric("Confidence", "98.5%", help="Model confidence level")
-        
-        st.markdown("---")
-        
-        # SHAP Feature Analysis
-        st.markdown("**🔍 SHAP Feature Analysis - Why This Kee Score?**")
-        st.markdown("*Each feature's contribution to the risk prediction*")
-        
-        shap_data = pd.DataFrame({
-            "Feature": [
-                "Volatility",
-                "Days Since Last Order",
-                "GMV Slope (Growth)",
-                "Sales Last 12 Months",
-                "Consistency Score",
-                "Active Months",
-                "Order Frequency",
-                "Recency Score"
-            ],
-            "Value": [0.25, 5, 1234.5, 136282, 0.75, 11, 22.3, 0.95],
-            "SHAP Impact": [-0.0020, -0.0015, -0.0010, -0.0008, -0.0006, -0.0004, -0.0003, -0.0002],
-            "Effect": [
-                "↓ Reduces Risk",
-                "↓ Reduces Risk",
-                "↓ Reduces Risk",
-                "↓ Reduces Risk",
-                "↓ Reduces Risk",
-                "↓ Reduces Risk",
-                "↓ Reduces Risk",
-                "↓ Reduces Risk"
-            ],
-            "Explanation": [
-                "Low volatility indicates stable business",
-                "Recent activity shows engagement",
-                "Positive growth trend is favorable",
-                "High sales volume reduces risk",
-                "Consistent behavior is positive",
-                "Long tenure indicates stability",
-                "Regular orders show reliability",
-                "Recent transactions are positive"
-            ]
-        })
-        
-        st.dataframe(shap_data, use_container_width=True, hide_index=True)
-        
-        # SHAP waterfall chart
-        fig = go.Figure(go.Waterfall(
-            name="SHAP",
-            orientation="h",
-            y=shap_data["Feature"],
-            x=shap_data["SHAP Impact"],
-            connector={"line": {"color": "rgb(63, 63, 63)"}},
-            decreasing={"marker": {"color": "green"}},
-            increasing={"marker": {"color": "red"}},
-        ))
-        fig.update_layout(
-            title="SHAP Feature Contributions (Waterfall)",
-            xaxis_title="Impact on Kee Score",
-            height=400
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-    
     # TAB 3: Bank Statement Analysis
     with tab3:
         st.markdown("#### 🏦 Bank Statement Analysis")
@@ -247,13 +518,14 @@ def render_credit_officer_dashboard():
         # Key financial metrics
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Monthly Income", "AED 18,500", "+5%")
+            st.metric("Monthly Income", f"AED {cust_data['avg_monthly_income']:,}", "+5%")
         with col2:
-            st.metric("Monthly Expenses", "AED 12,300", "+2%")
+            st.metric("Monthly Expenses", f"AED {cust_data['avg_expenses']:,}", "+2%")
         with col3:
-            st.metric("Avg Balance", "AED 45,230", "+8%")
+            st.metric("Avg Balance", f"AED {cust_data['bank_balance']:,}", "+8%")
         with col4:
-            st.metric("Savings Rate", "33.5%", "+3%")
+            savings_rate = ((cust_data['avg_monthly_income'] - cust_data['avg_expenses']) / cust_data['avg_monthly_income'] * 100)
+            st.metric("Savings Rate", f"{savings_rate:.1f}%", "+3%")
         
         st.markdown("---")
         
@@ -323,14 +595,17 @@ def render_credit_officer_dashboard():
         # Credit score display
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Credit Score", "745", "+15")
-            st.markdown("<p style='color: green; font-weight: bold;'>Good</p>", unsafe_allow_html=True)
+            st.metric("Credit Score", str(cust_data['aecb_score']), "+15")
+            score_label = "Excellent" if cust_data['aecb_score'] >= 800 else "Good" if cust_data['aecb_score'] >= 700 else "Fair"
+            score_color = "green" if cust_data['aecb_score'] >= 700 else "orange"
+            st.markdown(f"<p style='color: {score_color}; font-weight: bold;'>{score_label}</p>", unsafe_allow_html=True)
         with col2:
             st.metric("Credit History", "8 years", "")
         with col3:
-            st.metric("Active Loans", "2", "")
+            st.metric("Active Loans", str(cust_data['loans']), "")
         with col4:
-            st.metric("Credit Utilization", "28%", "-5%")
+            utilization = (cust_data['credit_cards'] * 15)  # Rough estimate
+            st.metric("Credit Utilization", f"{utilization}%", "-5%")
         
         st.markdown("---")
         
@@ -407,7 +682,7 @@ def render_credit_officer_dashboard():
         # Key metrics
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Avg Monthly Bill", "AED 850", "+2%")
+            st.metric("Avg Monthly Bill", f"AED {cust_data['dewa_avg']}", "+2%")
         with col2:
             st.metric("Payment Regularity", "100%", "")
         with col3:
@@ -589,130 +864,340 @@ def render_credit_officer_dashboard():
             """)
 
     
-    # Loan Recommendations Section
+    # Loan Recommendations Section - Dynamic based on Risk Level
     st.markdown("---")
     st.markdown("### 💡 Kee Loan Recommendations")
     
-    col1, col2, col3 = st.columns(3)
+    # Determine loan recommendation based on risk category
+    kee_score = cust_data['kee_score']
     
-    with col1:
-        st.markdown("**Recommended Loan Amount**")
-        # Recommended amount should not exceed requested limit
-        recommended_amount = min(requested_limit, 75000)
-        st.markdown(f"<h2 style='color: green;'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
-        if recommended_amount == requested_limit:
-            st.success(f"✅ Full requested amount approved")
-        else:
-            st.warning(f"⚠️ Approved amount is capped at AED {recommended_amount:,.0f}")
+    # Risk-based loan parameters
+    if kee_score < 0.05:  # Very Low Risk
+        loan_status = "APPROVED"
+        loan_color = "green"
+        recommended_amount = min(int(cust_data['gmv'] * 0.3), 75000)
+        interest_rate = 7.5
+        tenure_months = 6
+        collateral = "Not Required"
+        processing_fee_pct = 1.0
+        loan_message = "✅ Full loan amount approved with preferential terms"
+    elif kee_score < 0.1:  # Low Risk
+        loan_status = "APPROVED"
+        loan_color = "green"
+        recommended_amount = min(int(cust_data['gmv'] * 0.25), 50000)
+        interest_rate = 9.5
+        tenure_months = 6
+        collateral = "Recommended"
+        processing_fee_pct = 1.5
+        loan_message = "✅ Loan approved with standard terms"
+    elif kee_score < 0.5:  # Medium Risk
+        loan_status = "SMALL LOAN OFFERED"
+        loan_color = "orange"
+        recommended_amount = min(int(cust_data['gmv'] * 0.15), 25000)
+        interest_rate = 12.5
+        tenure_months = 4
+        collateral = "Required"
+        processing_fee_pct = 2.0
+        loan_message = "⚠️ Small loan amount offered with strict conditions"
+    elif kee_score < 0.7:  # High Risk
+        loan_status = "NO LOAN"
+        loan_color = "red"
+        recommended_amount = 0
+        interest_rate = None
+        tenure_months = None
+        collateral = "N/A"
+        processing_fee_pct = None
+        loan_message = "❌ Loan not recommended - High risk profile"
+    else:  # Very High Risk
+        loan_status = "NO LOAN"
+        loan_color = "red"
+        recommended_amount = 0
+        interest_rate = None
+        tenure_months = None
+        collateral = "N/A"
+        processing_fee_pct = None
+        loan_message = "❌ Loan rejected - Very high risk profile"
     
-    with col2:
-        st.markdown("**Suggested Interest Rate**")
-        st.markdown("<h2 style='color: #1f77b4;'>7.5%</h2>", unsafe_allow_html=True)
-        st.info("Preferential rate based on Kee Profile")
-    
-    with col3:
-        st.markdown("**Optimal Tenure**")
-        # Optimal tenure should not exceed 6 months
-        st.markdown("<h2 style='color: #ff7f0e;'>6 months</h2>", unsafe_allow_html=True)
-        st.info("Short-term repayment schedule")
-    
-    # Loan calculation details
-    st.markdown("---")
-    st.markdown("#### 📊 Loan Calculation Details")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        loan_details = pd.DataFrame({
-            "Parameter": [
-                "Loan Amount",
-                "Interest Rate (Annual)",
-                "Tenure",
-                "Monthly Installment",
-                "Total Interest",
-                "Total Repayment",
-                "Processing Fee",
-                "Collateral Required"
-            ],
-            "Value": [
-                f"AED {recommended_amount:,.0f}",
-                "7.5%",
-                "6 months",
-                f"AED {(recommended_amount * 1.0225 / 6):,.0f}",
-                f"AED {(recommended_amount * 0.0225):,.0f}",
-                f"AED {(recommended_amount * 1.0225):,.0f}",
-                f"AED {(recommended_amount * 0.01):,.0f}",
-                "Not Required"
-            ]
-        })
-        st.dataframe(loan_details, use_container_width=True, hide_index=True)
-    
-    with col2:
-        # Debt-to-Income calculation
-        monthly_income = 18500
-        existing_obligations = 3400
-        new_installment = recommended_amount * 1.09 / 24
-        total_obligations = existing_obligations + new_installment
-        dti_ratio = (total_obligations / monthly_income) * 100
+    # Display loan recommendation
+    if recommended_amount > 0:
+        col1, col2, col3 = st.columns(3)
         
-        st.markdown("**Debt-to-Income Analysis**")
-        dti_data = pd.DataFrame({
-            "Item": [
-                "Monthly Income",
-                "Existing Obligations",
-                "New Loan Installment",
-                "Total Obligations",
-                "Debt-to-Income Ratio",
-                "DTI Status"
-            ],
-            "Amount": [
-                f"AED {monthly_income:,.0f}",
-                f"AED {existing_obligations:,.0f}",
-                f"AED {new_installment:,.0f}",
-                f"AED {total_obligations:,.0f}",
-                f"{dti_ratio:.1f}%",
-                "✅ Healthy" if dti_ratio < 40 else "⚠️ High"
-            ]
-        })
-        st.dataframe(dti_data, use_container_width=True, hide_index=True)
+        with col1:
+            st.markdown("**Recommended Loan Amount**")
+            st.markdown(f"<h2 style='color: {loan_color};'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
+            if loan_status == "APPROVED":
+                st.success(loan_message)
+            else:
+                st.warning(loan_message)
         
-        if dti_ratio < 40:
-            st.success(f"✅ DTI ratio of {dti_ratio:.1f}% is within acceptable limits (<40%)")
-        else:
-            st.warning(f"⚠️ DTI ratio of {dti_ratio:.1f}% exceeds recommended limit")
+        with col2:
+            st.markdown("**Suggested Interest Rate**")
+            st.markdown(f"<h2 style='color: {loan_color};'>{interest_rate}%</h2>", unsafe_allow_html=True)
+            if interest_rate <= 9.5:
+                st.info("Competitive rate based on risk profile")
+            else:
+                st.warning("Higher rate due to elevated risk")
+        
+        with col3:
+            st.markdown("**Optimal Tenure**")
+            st.markdown(f"<h2 style='color: {loan_color};'>{tenure_months} months</h2>", unsafe_allow_html=True)
+            if tenure_months >= 6:
+                st.info("Standard repayment schedule")
+            else:
+                st.warning("Shorter tenure to mitigate risk")
+        
+        # Loan calculation details
+        st.markdown("---")
+        st.markdown("#### 📊 Loan Calculation Details")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Calculate loan financials
+            total_interest = recommended_amount * (interest_rate / 100) * (tenure_months / 12)
+            total_repayment = recommended_amount + total_interest
+            monthly_installment = total_repayment / tenure_months
+            processing_fee = recommended_amount * (processing_fee_pct / 100)
+            
+            loan_details = pd.DataFrame({
+                "Parameter": [
+                    "Loan Amount",
+                    "Interest Rate (Annual)",
+                    "Tenure",
+                    "Monthly Installment",
+                    "Total Interest",
+                    "Total Repayment",
+                    "Processing Fee",
+                    "Collateral Required"
+                ],
+                "Value": [
+                    f"AED {recommended_amount:,.0f}",
+                    f"{interest_rate}%",
+                    f"{tenure_months} months",
+                    f"AED {monthly_installment:,.0f}",
+                    f"AED {total_interest:,.0f}",
+                    f"AED {total_repayment:,.0f}",
+                    f"AED {processing_fee:,.0f} ({processing_fee_pct}%)",
+                    collateral
+                ]
+            })
+            st.dataframe(loan_details, use_container_width=True, hide_index=True)
+        
+        with col2:
+            # Debt-to-Income calculation
+            monthly_income = cust_data['avg_monthly_income']
+            existing_obligations = 3400  # From existing loans/cards
+            new_installment = monthly_installment
+            total_obligations = existing_obligations + new_installment
+            dti_ratio = (total_obligations / monthly_income) * 100
+            
+            st.markdown("**Debt-to-Income Analysis**")
+            dti_data = pd.DataFrame({
+                "Item": [
+                    "Monthly Income",
+                    "Existing Obligations",
+                    "New Loan Installment",
+                    "Total Obligations",
+                    "Debt-to-Income Ratio",
+                    "DTI Status"
+                ],
+                "Amount": [
+                    f"AED {monthly_income:,.0f}",
+                    f"AED {existing_obligations:,.0f}",
+                    f"AED {new_installment:,.0f}",
+                    f"AED {total_obligations:,.0f}",
+                    f"{dti_ratio:.1f}%",
+                    "✅ Healthy" if dti_ratio < 40 else "⚠️ High"
+                ]
+            })
+            st.dataframe(dti_data, use_container_width=True, hide_index=True)
+            
+            if dti_ratio < 40:
+                st.success(f"✅ DTI ratio of {dti_ratio:.1f}% is within acceptable limits (<40%)")
+            else:
+                st.warning(f"⚠️ DTI ratio of {dti_ratio:.1f}% exceeds recommended limit")
+    else:
+        # No loan offered - display rejection message
+        st.error(f"""
+        ### ❌ {loan_status}
+        
+        **Reason:** {loan_message}
+        
+        **Risk Assessment:**
+        - Kee Score: {kee_score:.6f} ({risk_category})
+        - Risk Level: Too high for loan approval
+        
+        **Recommendations:**
+        - Build credit history with smaller transactions
+        - Improve business stability and reduce volatility
+        - Reapply after 6-12 months with improved metrics
+        - Consider alternative financing options
+        - Provide additional collateral or guarantor
+        
+        **Alternative Options:**
+        - Trade credit with shorter payment terms
+        - Secured financing with substantial collateral
+        - Co-signer with strong credit profile
+        - Business improvement program enrollment
+        """)
 
     
     # Final Recommendation
     st.markdown("---")
     st.markdown("### 🎯 Credit Decision Recommendation")
     
-    # Decision box
-    st.success("""
-    ### ✅ RECOMMENDED: APPROVE
+    # Dynamic decision based on Kee Score and DTI
+    kee_score = cust_data['kee_score']
+    
+    # Calculate DTI ratio for decision logic
+    monthly_income = cust_data['avg_monthly_income']
+    existing_obligations = 3400  # From existing loans/cards
+    # Estimate potential new installment for DTI calculation
+    estimated_loan = min(int(cust_data['gmv'] * 0.3), 50000)
+    estimated_installment = (estimated_loan * 1.075 * 0.5) / 6  # Rough estimate
+    total_obligations = existing_obligations + estimated_installment
+    dti_ratio = (total_obligations / monthly_income) * 100
+    
+    # Decision logic
+    if kee_score < 0.05 and dti_ratio < 40:
+        decision = "APPROVE"
+        decision_color = "success"
+        decision_icon = "✅"
+        interest_rate = 7.5
+        collateral = "Not required"
+    elif kee_score < 0.1 and dti_ratio < 45:
+        decision = "APPROVE WITH CONDITIONS"
+        decision_color = "warning"
+        decision_icon = "⚠️"
+        interest_rate = 9.5
+        collateral = "Recommended"
+    elif kee_score < 0.5 and dti_ratio < 50:
+        decision = "CONDITIONAL APPROVAL"
+        decision_color = "warning"
+        decision_icon = "⚠️"
+        interest_rate = 12.5
+        collateral = "Required"
+    else:
+        decision = "REJECT"
+        decision_color = "error"
+        decision_icon = "❌"
+        interest_rate = None
+        collateral = "N/A"
+    
+    # Build rationale based on actual data
+    rationale_items = []
+    
+    # Kee Score assessment
+    if kee_score < 0.05:
+        rationale_items.append(f"✅ Very Low Kee Score ({kee_score:.6f} probability of default)")
+    elif kee_score < 0.1:
+        rationale_items.append(f"⚠️ Low Kee Score ({kee_score:.6f} probability of default)")
+    elif kee_score < 0.5:
+        rationale_items.append(f"⚠️ Medium Kee Score ({kee_score:.6f} probability of default)")
+    else:
+        rationale_items.append(f"❌ High Kee Score ({kee_score:.6f} probability of default)")
+    
+    # DTI assessment
+    if dti_ratio < 40:
+        rationale_items.append(f"✅ Healthy debt-to-income ratio ({dti_ratio:.1f}%)")
+    elif dti_ratio < 50:
+        rationale_items.append(f"⚠️ Elevated debt-to-income ratio ({dti_ratio:.1f}%)")
+    else:
+        rationale_items.append(f"❌ High debt-to-income ratio ({dti_ratio:.1f}%)")
+    
+    # Credit score assessment
+    if cust_data['aecb_score'] >= 750:
+        rationale_items.append(f"✅ Excellent credit score ({cust_data['aecb_score']})")
+    elif cust_data['aecb_score'] >= 700:
+        rationale_items.append(f"✅ Good credit score ({cust_data['aecb_score']})")
+    elif cust_data['aecb_score'] >= 650:
+        rationale_items.append(f"⚠️ Fair credit score ({cust_data['aecb_score']})")
+    else:
+        rationale_items.append(f"❌ Poor credit score ({cust_data['aecb_score']})")
+    
+    # GMV and business performance
+    if cust_data['gmv'] > 100000:
+        rationale_items.append(f"✅ Strong business performance (AED {cust_data['gmv']:,.2f} GMV)")
+    elif cust_data['gmv'] > 50000:
+        rationale_items.append(f"✅ Moderate business performance (AED {cust_data['gmv']:,.2f} GMV)")
+    else:
+        rationale_items.append(f"⚠️ Limited business history (AED {cust_data['gmv']:,.2f} GMV)")
+    
+    # Active months
+    if cust_data['active_months'] >= 12:
+        rationale_items.append(f"✅ Long tenure ({cust_data['active_months']} months)")
+    elif cust_data['active_months'] >= 6:
+        rationale_items.append(f"✅ Established customer ({cust_data['active_months']} months)")
+    else:
+        rationale_items.append(f"⚠️ New customer ({cust_data['active_months']} months)")
+    
+    # Income stability
+    rationale_items.append("✅ Stable income and employment")
+    rationale_items.append("✅ 100% on-time utility bill payments")
+    rationale_items.append("✅ All KYC documents verified")
+    
+    # Display decision box
+    rationale_text = "\n".join([f"    - {item}" for item in rationale_items])
+    
+    if decision == "APPROVE":
+        st.success(f"""
+    ### {decision_icon} RECOMMENDED: {decision}
     
     **Rationale:**
-    - ✅ Very Low Kee Score (0.000123 probability of default)
-    - ✅ Excellent payment history across all sources
-    - ✅ Stable income and employment (4 years)
-    - ✅ Strong cash flow and savings behavior
-    - ✅ Good credit score (745) with no delinquencies
-    - ✅ 100% on-time utility bill payments
-    - ✅ Low volatility and positive growth trend
-    - ✅ Healthy debt-to-income ratio (18.4%)
-    - ✅ All KYC documents verified
+{rationale_text}
     
     **Suggested Terms:**
-    - **Loan Amount:** AED 50,000 (as requested)
-    - **Interest Rate:** 7.5% per annum (preferential rate)
+    - **Loan Amount:** AED {recommended_amount:,.0f}
+    - **Interest Rate:** {interest_rate}% per annum (preferential rate)
     - **Tenure:** 6 months
-    - **Monthly Installment:** AED 8,521
-    - **Collateral:** Not required
-    - **Processing Fee:** AED 500 (1%)
+    - **Monthly Installment:** AED {(recommended_amount * (1 + interest_rate/100 * 0.5) / 6):,.0f}
+    - **Collateral:** {collateral}
+    - **Processing Fee:** AED {(recommended_amount * 0.01):,.0f} (1%)
     
     **Conditions:**
     - Maintain current employment
     - No additional credit inquiries during loan tenure
     - Auto-debit setup for repayments
+    """)
+    elif decision in ["APPROVE WITH CONDITIONS", "CONDITIONAL APPROVAL"]:
+        st.warning(f"""
+    ### {decision_icon} RECOMMENDED: {decision}
+    
+    **Rationale:**
+{rationale_text}
+    
+    **Suggested Terms:**
+    - **Loan Amount:** AED {recommended_amount:,.0f}
+    - **Interest Rate:** {interest_rate}% per annum (higher risk premium)
+    - **Tenure:** 6 months
+    - **Monthly Installment:** AED {(recommended_amount * (1 + interest_rate/100 * 0.5) / 6):,.0f}
+    - **Collateral:** {collateral}
+    - **Processing Fee:** AED {(recommended_amount * 0.015):,.0f} (1.5%)
+    
+    **Additional Conditions:**
+    - Provide additional collateral or guarantor
+    - Reduce loan amount by 30-50%
+    - Shorter tenure (3-4 months)
+    - Weekly payment monitoring
+    - Mandatory financial counseling
+    """)
+    else:
+        st.error(f"""
+    ### {decision_icon} RECOMMENDED: {decision}
+    
+    **Rationale:**
+{rationale_text}
+    
+    **Reasons for Rejection:**
+    - Risk score exceeds acceptable threshold
+    - Insufficient creditworthiness indicators
+    - High probability of default
+    
+    **Alternative Options:**
+    - Reapply after 6 months with improved metrics
+    - Consider secured loan with substantial collateral
+    - Build credit history with smaller transactions
+    - Provide co-signer with strong credit profile
     """)
     
     # Action Buttons
