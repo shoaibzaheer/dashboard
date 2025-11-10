@@ -168,7 +168,8 @@ def render_credit_officer_dashboard():
             
             # Scale Kee score to 1-10 range (10 = lowest risk, 1 = highest risk)
             # Invert so higher score = lower risk (like credit scores)
-            kee_score_scaled = min(10, max(1, 10 - (raw_kee_score * 100)))
+            # Formula: 10 - (risk * 9) maps [0,1] risk to [10,1] score
+            kee_score_scaled = min(10, max(1, 10 - (raw_kee_score * 9)))
             
             # Determine AECB score based on risk level (inverse relationship)
             # High Kee score (high risk) = Low AECB score
