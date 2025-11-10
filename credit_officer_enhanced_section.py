@@ -145,26 +145,31 @@ def render_credit_officer_dashboard():
             # Build customer data dictionary from CSV
             # Use account_value as GMV proxy, calculate orders from active months
             account_val = float(cust_row.get('account_value', 0))
-            active_mons = max(4, int(cust_row.get('active_months', 4)))  # Ensure at least 4 months if customer exists
-            days_since = int(cust_row.get('days_since_last_order', 30))
             
-            # Get raw Kee score first for GMV/orders calculation
+            # Get raw Kee score first for all calculations
             raw_kee_score = float(cust_row.get('risk_score_30d', 0.001))
             
-            # Estimate GMV and orders based on account value and activity (more realistic ranges)
-            # Adjust based on risk level - high risk customers have lower GMV/orders
+            # Adjust metrics based on risk level - LOW RISK = BETTER METRICS
             if raw_kee_score >= 0.7:  # Very High Risk
                 estimated_gmv = max(account_val * 500, np.random.uniform(15000, 50000))
-                estimated_orders = max(active_mons * 5, np.random.randint(20, 60))
+                estimated_orders = np.random.randint(20, 60)
+                active_mons = max(4, int(cust_row.get('active_months', np.random.randint(4, 8))))
+                days_since = np.random.randint(45, 90)  # Long time since last order
             elif raw_kee_score >= 0.5:  # High Risk
                 estimated_gmv = max(account_val * 700, np.random.uniform(25000, 80000))
-                estimated_orders = max(active_mons * 8, np.random.randint(30, 100))
+                estimated_orders = np.random.randint(30, 100)
+                active_mons = max(6, int(cust_row.get('active_months', np.random.randint(6, 10))))
+                days_since = np.random.randint(30, 60)
             elif raw_kee_score >= 0.1:  # Medium Risk
                 estimated_gmv = max(account_val * 900, np.random.uniform(40000, 150000))
-                estimated_orders = max(active_mons * 12, np.random.randint(50, 150))
+                estimated_orders = np.random.randint(50, 150)
+                active_mons = max(8, int(cust_row.get('active_months', np.random.randint(8, 14))))
+                days_since = np.random.randint(15, 35)
             else:  # Low to Very Low Risk
                 estimated_gmv = max(account_val * 1000, np.random.uniform(80000, 250000))
-                estimated_orders = max(active_mons * 15, np.random.randint(80, 200))
+                estimated_orders = np.random.randint(80, 200)
+                active_mons = max(12, int(cust_row.get('active_months', np.random.randint(12, 24))))
+                days_since = np.random.randint(1, 15)  # Very recent activity
             
             # Scale Kee score to 1-10 range (10 = lowest risk, 1 = highest risk)
             # Invert so higher score = lower risk (like credit scores)
