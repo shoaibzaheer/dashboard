@@ -487,6 +487,472 @@ def render_credit_officer_dashboard():
         )
         st.plotly_chart(fig, use_container_width=True)
 
+        # Loan Recommendations Section - Dynamic based on Risk Level
+        st.markdown("---")
+        st.markdown("### 💡 Kee Loan Recommendations")
+        
+        # Determine loan recommendation based on risk category
+        kee_score = cust_data['kee_score']
+        
+        # Risk-based loan parameters
+        if kee_score < 0.05:  # Very Low Risk
+            loan_status = "APPROVED"
+            loan_color = "green"
+            recommended_amount = min(int(cust_data['gmv'] * 0.3), 75000)
+            interest_rate = 7.5
+            tenure_months = 6
+            collateral = "Not Required"
+            processing_fee_pct = 1.0
+            loan_message = "✅ Full loan amount approved with preferential terms"
+        elif kee_score < 0.1:  # Low Risk
+            loan_status = "APPROVED"
+            loan_color = "green"
+            recommended_amount = min(int(cust_data['gmv'] * 0.25), 50000)
+            interest_rate = 9.5
+            tenure_months = 6
+            collateral = "Recommended"
+            processing_fee_pct = 1.5
+            loan_message = "✅ Loan approved with standard terms"
+        elif kee_score < 0.5:  # Medium Risk
+            loan_status = "SMALL LOAN OFFERED"
+            loan_color = "orange"
+            recommended_amount = min(int(cust_data['gmv'] * 0.15), 25000)
+            interest_rate = 12.5
+            tenure_months = 4
+            collateral = "Required"
+            processing_fee_pct = 2.0
+            loan_message = "⚠️ Small loan amount offered with strict conditions"
+        elif kee_score < 0.7:  # High Risk
+            loan_status = "NO LOAN"
+            loan_color = "red"
+            recommended_amount = 0
+            interest_rate = None
+            tenure_months = None
+            collateral = "N/A"
+            processing_fee_pct = None
+            loan_message = "❌ Loan not recommended - High risk profile"
+        else:  # Very High Risk
+            loan_status = "NO LOAN"
+            loan_color = "red"
+            recommended_amount = 0
+            interest_rate = None
+            tenure_months = None
+            collateral = "N/A"
+            processing_fee_pct = None
+            loan_message = "❌ Loan rejected - Very high risk profile"
+        
+        # Display loan recommendation
+        if recommended_amount > 0:
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown("**Recommended Loan Amount**")
+                st.markdown(f"<h2 style='color: {loan_color};'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
+                if loan_status == "APPROVED":
+                    st.success(loan_message)
+                else:
+                    st.warning(loan_message)
+            
+            with col2:
+                st.markdown("**Suggested Interest Rate**")
+                st.markdown(f"<h2 style='color: {loan_color};'>{interest_rate}%</h2>", unsafe_allow_html=True)
+                if interest_rate <= 9.5:
+                    st.info("Competitive rate based on risk profile")
+                else:
+                    st.warning("Higher rate due to elevated risk")
+            
+            with col3:
+                st.markdown("**Optimal Tenure**")
+                st.markdown(f"<h2 style='color: {loan_color};'>{tenure_months} months</h2>", unsafe_allow_html=True)
+                if tenure_months >= 6:
+                    st.info("Standard repayment schedule")
+                else:
+                    st.warning("Shorter tenure to mitigate risk")
+            
+            # Loan calculation details
+            st.markdown("---")
+            st.markdown("#### 📊 Loan Calculation Details")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Calculate loan financials
+                total_interest = recommended_amount * (interest_rate / 100) * (tenure_months / 12)
+                total_repayment = recommended_amount + total_interest
+                monthly_installment = total_repayment / tenure_months
+                processing_fee = recommended_amount * (processing_fee_pct / 100)
+                
+                loan_details = pd.DataFrame({
+                    "Parameter": [
+                        "Loan Amount",
+                        "Interest Rate (Annual)",
+                        "Tenure",
+                        "Monthly Installment",
+                        "Total Interest",
+                        "Total Repayment",
+                        "Processing Fee",
+                        "Collateral Required"
+                    ],
+                    "Value": [
+                        f"AED {recommended_amount:,.0f}",
+                        f"{interest_rate}%",
+                        f"{tenure_months} months",
+                        f"AED {monthly_installment:,.0f}",
+                        f"AED {total_interest:,.0f}",
+                        f"AED {total_repayment:,.0f}",
+                        f"AED {processing_fee:,.0f} ({processing_fee_pct}%)",
+                        collateral
+                    ]
+                })
+                st.dataframe(loan_details, use_container_width=True, hide_index=True)
+            
+            with col2:
+                # Debt-to-Income calculation
+                monthly_income = cust_data['avg_monthly_income']
+                existing_obligations = 3400  # From existing loans/cards
+                new_installment = monthly_installment
+                total_obligations = existing_obligations + new_installment
+                dti_ratio = (total_obligations / monthly_income) * 100
+                
+                st.markdown("**Debt-to-Income Analysis**")
+                dti_data = pd.DataFrame({
+                    "Item": [
+                        "Monthly Income",
+                        "Existing Obligations",
+                        "New Loan Installment",
+                        "Total Obligations",
+                        "Debt-to-Income Ratio",
+                        "DTI Status"
+                    ],
+                    "Amount": [
+                        f"AED {monthly_income:,.0f}",
+                        f"AED {existing_obligations:,.0f}",
+                        f"AED {new_installment:,.0f}",
+                        f"AED {total_obligations:,.0f}",
+                        f"{dti_ratio:.1f}%",
+                        "✅ Healthy" if dti_ratio < 40 else "⚠️ High"
+                    ]
+                })
+                st.dataframe(dti_data, use_container_width=True, hide_index=True)
+                
+                if dti_ratio < 40:
+                    st.success(f"✅ DTI ratio of {dti_ratio:.1f}% is within acceptable limits (<40%)")
+                else:
+                    st.warning(f"⚠️ DTI ratio of {dti_ratio:.1f}% exceeds recommended limit")
+        else:
+            # No loan offered - display rejection message
+            st.error(f"""
+            ### ❌ {loan_status}
+            
+            **Reason:** {loan_message}
+            
+            **Risk Assessment:**
+            - Kee Score: {kee_score:.6f} ({risk_category})
+            - Risk Level: Too high for loan approval
+            
+            **Recommendations:**
+            - Build credit history with smaller transactions
+            - Improve business stability and reduce volatility
+            - Reapply after 6-12 months with improved metrics
+            - Consider alternative financing options
+            - Provide additional collateral or guarantor
+            
+            **Alternative Options:**
+            - Trade credit with shorter payment terms
+            - Secured financing with substantial collateral
+            - Co-signer with strong credit profile
+            - Business improvement program enrollment
+            """)
+
+        
+        # Final Recommendation
+        st.markdown("---")
+        st.markdown("### 🎯 Credit Decision Recommendation")
+        
+        # Dynamic decision based on Kee Score and DTI
+        kee_score = cust_data['kee_score']
+        
+        # Calculate DTI ratio for decision logic
+        monthly_income = cust_data['avg_monthly_income']
+        existing_obligations = 3400  # From existing loans/cards
+        # Estimate potential new installment for DTI calculation
+        estimated_loan = min(int(cust_data['gmv'] * 0.3), 50000)
+        estimated_installment = (estimated_loan * 1.075 * 0.5) / 6  # Rough estimate
+        total_obligations = existing_obligations + estimated_installment
+        dti_ratio = (total_obligations / monthly_income) * 100
+        
+        # Decision logic
+        if kee_score < 0.05 and dti_ratio < 40:
+            decision = "APPROVE"
+            decision_color = "success"
+            decision_icon = "✅"
+            interest_rate_decision = 7.5
+            collateral_decision = "Not required"
+        elif kee_score < 0.1 and dti_ratio < 45:
+            decision = "APPROVE WITH CONDITIONS"
+            decision_color = "warning"
+            decision_icon = "⚠️"
+            interest_rate_decision = 9.5
+            collateral_decision = "Recommended"
+        elif kee_score < 0.5 and dti_ratio < 50:
+            decision = "CONDITIONAL APPROVAL"
+            decision_color = "warning"
+            decision_icon = "⚠️"
+            interest_rate_decision = 12.5
+            collateral_decision = "Required"
+        else:
+            decision = "REJECT"
+            decision_color = "error"
+            decision_icon = "❌"
+            interest_rate_decision = None
+            collateral_decision = "N/A"
+        
+        # Build rationale based on actual data
+        rationale_items = []
+        
+        # Kee Score assessment
+        if kee_score < 0.05:
+            rationale_items.append(f"✅ Very Low Kee Score ({kee_score:.6f} probability of default)")
+        elif kee_score < 0.1:
+            rationale_items.append(f"⚠️ Low Kee Score ({kee_score:.6f} probability of default)")
+        elif kee_score < 0.5:
+            rationale_items.append(f"⚠️ Medium Kee Score ({kee_score:.6f} probability of default)")
+        else:
+            rationale_items.append(f"❌ High Kee Score ({kee_score:.6f} probability of default)")
+        
+        # DTI assessment
+        if dti_ratio < 40:
+            rationale_items.append(f"✅ Healthy debt-to-income ratio ({dti_ratio:.1f}%)")
+        elif dti_ratio < 50:
+            rationale_items.append(f"⚠️ Elevated debt-to-income ratio ({dti_ratio:.1f}%)")
+        else:
+            rationale_items.append(f"❌ High debt-to-income ratio ({dti_ratio:.1f}%)")
+        
+        # Credit score assessment
+        if cust_data['aecb_score'] >= 750:
+            rationale_items.append(f"✅ Excellent credit score ({cust_data['aecb_score']})")
+        elif cust_data['aecb_score'] >= 700:
+            rationale_items.append(f"✅ Good credit score ({cust_data['aecb_score']})")
+        elif cust_data['aecb_score'] >= 650:
+            rationale_items.append(f"⚠️ Fair credit score ({cust_data['aecb_score']})")
+        else:
+            rationale_items.append(f"❌ Poor credit score ({cust_data['aecb_score']})")
+        
+        # GMV and business performance
+        if cust_data['gmv'] > 100000:
+            rationale_items.append(f"✅ Strong business performance (AED {cust_data['gmv']:,.2f} GMV)")
+        elif cust_data['gmv'] > 50000:
+            rationale_items.append(f"✅ Moderate business performance (AED {cust_data['gmv']:,.2f} GMV)")
+        else:
+            rationale_items.append(f"⚠️ Limited business history (AED {cust_data['gmv']:,.2f} GMV)")
+        
+        # Active months
+        if cust_data['active_months'] >= 12:
+            rationale_items.append(f"✅ Long tenure ({cust_data['active_months']} months)")
+        elif cust_data['active_months'] >= 6:
+            rationale_items.append(f"✅ Established customer ({cust_data['active_months']} months)")
+        else:
+            rationale_items.append(f"⚠️ New customer ({cust_data['active_months']} months)")
+        
+        # Income stability
+        rationale_items.append("✅ Stable income and employment")
+        rationale_items.append("✅ 100% on-time utility bill payments")
+        rationale_items.append("✅ All KYC documents verified")
+        
+        # Display decision box
+        rationale_text = "\n".join([f"        - {item}" for item in rationale_items])
+        
+        if decision == "APPROVE":
+            st.success(f"""
+        ### {decision_icon} RECOMMENDED: {decision}
+        
+        **Rationale:**
+{rationale_text}
+        
+        **Suggested Terms:**
+        - **Loan Amount:** AED {recommended_amount:,.0f}
+        - **Interest Rate:** {interest_rate_decision}% per annum (preferential rate)
+        - **Tenure:** 6 months
+        - **Monthly Installment:** AED {(recommended_amount * (1 + interest_rate_decision/100 * 0.5) / 6):,.0f}
+        - **Collateral:** {collateral_decision}
+        - **Processing Fee:** AED {(recommended_amount * 0.01):,.0f} (1%)
+        
+        **Conditions:**
+        - Maintain current employment
+        - No additional credit inquiries during loan tenure
+        - Auto-debit setup for repayments
+        """)
+        elif decision in ["APPROVE WITH CONDITIONS", "CONDITIONAL APPROVAL"]:
+            st.warning(f"""
+        ### {decision_icon} RECOMMENDED: {decision}
+        
+        **Rationale:**
+{rationale_text}
+        
+        **Suggested Terms:**
+        - **Loan Amount:** AED {recommended_amount:,.0f}
+        - **Interest Rate:** {interest_rate_decision}% per annum (higher risk premium)
+        - **Tenure:** 6 months
+        - **Monthly Installment:** AED {(recommended_amount * (1 + interest_rate_decision/100 * 0.5) / 6):,.0f}
+        - **Collateral:** {collateral_decision}
+        - **Processing Fee:** AED {(recommended_amount * 0.015):,.0f} (1.5%)
+        
+        **Additional Conditions:**
+        - Provide additional collateral or guarantor
+        - Reduce loan amount by 30-50%
+        - Shorter tenure (3-4 months)
+        - Weekly payment monitoring
+        - Mandatory financial counseling
+        """)
+        else:
+            st.error(f"""
+        ### {decision_icon} RECOMMENDED: {decision}
+        
+        **Rationale:**
+{rationale_text}
+        
+        **Reasons for Rejection:**
+        - Risk score exceeds acceptable threshold
+        - Insufficient creditworthiness indicators
+        - High probability of default
+        
+        **Alternative Options:**
+        - Reapply after 6 months with improved metrics
+        - Consider secured loan with substantial collateral
+        - Build credit history with smaller transactions
+        - Provide co-signer with strong credit profile
+        """)
+        
+        # Action Buttons
+        st.markdown("---")
+        st.markdown("### 🎬 Take Action")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            if st.button("✅ Approve Loan", type="primary", use_container_width=True):
+                st.session_state['decision'] = 'approved'
+                st.balloons()
+                st.success("✅ Loan Approved! Notification sent to customer.")
+                st.info(f"""
+                **Approval Details:**
+                - Customer: {selected_customer.split(' - ')[1]}
+                - Amount: AED {recommended_amount:,.0f}
+                - Rate: 7.5%
+                - Approved by: Credit Officer
+                - Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+                """)
+        
+        with col2:
+            if st.button("❌ Reject Loan", use_container_width=True):
+                st.session_state['decision'] = 'rejected'
+                
+                # Rejection reason selector
+                rejection_reason = st.selectbox(
+                    "Select Rejection Reason",
+                    [
+                        "Insufficient income",
+                        "High debt-to-income ratio",
+                        "Poor credit history",
+                        "Incomplete documentation",
+                        "Employment concerns",
+                        "Other"
+                    ]
+                )
+                
+                rejection_notes = st.text_area("Additional Notes", placeholder="Enter reason for rejection...")
+                
+                if st.button("Confirm Rejection"):
+                    st.error(f"❌ Loan Rejected. Reason: {rejection_reason}")
+                    st.info(f"""
+                    **Rejection Details:**
+                    - Customer: {selected_customer.split(' - ')[1]}
+                    - Reason: {rejection_reason}
+                    - Notes: {rejection_notes}
+                    - Rejected by: Credit Officer
+                    - Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+                    """)
+        
+        with col3:
+            if st.button("📋 Request More Info", use_container_width=True):
+                st.warning("📋 Information Request Sent")
+                
+                required_docs = st.multiselect(
+                    "Select Required Documents",
+                    [
+                        "Updated bank statements",
+                        "Recent salary certificate",
+                        "Additional references",
+                        "Property documents",
+                        "Business license",
+                        "Tax returns"
+                    ]
+                )
+                
+                additional_info = st.text_area("Specify Additional Information Needed")
+                
+                if st.button("Send Request"):
+                    st.info(f"""
+                    **Information Request Sent:**
+                    - Customer: {selected_customer.split(' - ')[1]}
+                    - Documents: {', '.join(required_docs)}
+                    - Additional Info: {additional_info}
+                    - Deadline: {(datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')}
+                    """)
+        
+        with col4:
+            if st.button("💾 Save for Later", use_container_width=True):
+                st.info("💾 Application saved to pending queue")
+                st.success(f"""
+                **Saved Successfully:**
+                - Customer: {selected_customer.split(' - ')[1]}
+                - Status: Pending Review
+                - Saved by: Credit Officer
+                - Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+                - Reminder: Set for tomorrow
+                """)
+
+        
+        # Recent Decisions History
+        st.markdown("---")
+        st.markdown("### 📋 Recent Credit Decisions")
+        
+        decisions_data = pd.DataFrame({
+            "Date": [
+                "2025-06-06 14:30",
+                "2025-06-06 13:15",
+                "2025-06-05 16:45",
+                "2025-06-05 11:20",
+                "2025-06-04 15:10"
+            ],
+            "Customer ID": ["8697", "5432", "9876", "3456", "7890"],
+            "Customer Name": [
+                "Khalid Al Shamsi",
+                "Mariam Al Blooshi",
+                "Omar Al Suwaidi",
+                "Noura Al Dhaheri",
+                "Hassan Al Kaabi"
+            ],
+            "Requested": ["AED 50,000", "AED 30,000", "AED 100,000", "AED 25,000", "AED 75,000"],
+            "Approved": ["AED 50,000", "AED 30,000", "Rejected", "AED 25,000", "AED 60,000"],
+            "Decision": ["✅ Approved", "✅ Approved", "❌ Rejected", "✅ Approved", "✅ Approved"],
+            "Officer": ["You", "You", "You", "Sarah M.", "Ahmed K."],
+            "Kee Score": ["0.000123", "0.002", "0.085", "0.001", "0.003"]
+        })
+        
+        st.dataframe(decisions_data, use_container_width=True, hide_index=True)
+        
+        # Statistics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Today's Approvals", "15", "+3")
+        with col2:
+            st.metric("Today's Rejections", "3", "-1")
+        with col3:
+            st.metric("Approval Rate", "83.3%", "+5%")
+        with col4:
+            st.metric("Avg Decision Time", "12 min", "-2 min")
+
     
     # TAB 2: Distribution Partner Transaction Data
     with tab2:
@@ -907,472 +1373,6 @@ def render_credit_officer_dashboard():
             - **PEP Status:** ✅ Not PEP
             """)
 
-    
-    # Loan Recommendations Section - Dynamic based on Risk Level
-    st.markdown("---")
-    st.markdown("### 💡 Kee Loan Recommendations")
-    
-    # Determine loan recommendation based on risk category
-    kee_score = cust_data['kee_score']
-    
-    # Risk-based loan parameters
-    if kee_score < 0.05:  # Very Low Risk
-        loan_status = "APPROVED"
-        loan_color = "green"
-        recommended_amount = min(int(cust_data['gmv'] * 0.3), 75000)
-        interest_rate = 7.5
-        tenure_months = 6
-        collateral = "Not Required"
-        processing_fee_pct = 1.0
-        loan_message = "✅ Full loan amount approved with preferential terms"
-    elif kee_score < 0.1:  # Low Risk
-        loan_status = "APPROVED"
-        loan_color = "green"
-        recommended_amount = min(int(cust_data['gmv'] * 0.25), 50000)
-        interest_rate = 9.5
-        tenure_months = 6
-        collateral = "Recommended"
-        processing_fee_pct = 1.5
-        loan_message = "✅ Loan approved with standard terms"
-    elif kee_score < 0.5:  # Medium Risk
-        loan_status = "SMALL LOAN OFFERED"
-        loan_color = "orange"
-        recommended_amount = min(int(cust_data['gmv'] * 0.15), 25000)
-        interest_rate = 12.5
-        tenure_months = 4
-        collateral = "Required"
-        processing_fee_pct = 2.0
-        loan_message = "⚠️ Small loan amount offered with strict conditions"
-    elif kee_score < 0.7:  # High Risk
-        loan_status = "NO LOAN"
-        loan_color = "red"
-        recommended_amount = 0
-        interest_rate = None
-        tenure_months = None
-        collateral = "N/A"
-        processing_fee_pct = None
-        loan_message = "❌ Loan not recommended - High risk profile"
-    else:  # Very High Risk
-        loan_status = "NO LOAN"
-        loan_color = "red"
-        recommended_amount = 0
-        interest_rate = None
-        tenure_months = None
-        collateral = "N/A"
-        processing_fee_pct = None
-        loan_message = "❌ Loan rejected - Very high risk profile"
-    
-    # Display loan recommendation
-    if recommended_amount > 0:
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.markdown("**Recommended Loan Amount**")
-            st.markdown(f"<h2 style='color: {loan_color};'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
-            if loan_status == "APPROVED":
-                st.success(loan_message)
-            else:
-                st.warning(loan_message)
-        
-        with col2:
-            st.markdown("**Suggested Interest Rate**")
-            st.markdown(f"<h2 style='color: {loan_color};'>{interest_rate}%</h2>", unsafe_allow_html=True)
-            if interest_rate <= 9.5:
-                st.info("Competitive rate based on risk profile")
-            else:
-                st.warning("Higher rate due to elevated risk")
-        
-        with col3:
-            st.markdown("**Optimal Tenure**")
-            st.markdown(f"<h2 style='color: {loan_color};'>{tenure_months} months</h2>", unsafe_allow_html=True)
-            if tenure_months >= 6:
-                st.info("Standard repayment schedule")
-            else:
-                st.warning("Shorter tenure to mitigate risk")
-        
-        # Loan calculation details
-        st.markdown("---")
-        st.markdown("#### 📊 Loan Calculation Details")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # Calculate loan financials
-            total_interest = recommended_amount * (interest_rate / 100) * (tenure_months / 12)
-            total_repayment = recommended_amount + total_interest
-            monthly_installment = total_repayment / tenure_months
-            processing_fee = recommended_amount * (processing_fee_pct / 100)
-            
-            loan_details = pd.DataFrame({
-                "Parameter": [
-                    "Loan Amount",
-                    "Interest Rate (Annual)",
-                    "Tenure",
-                    "Monthly Installment",
-                    "Total Interest",
-                    "Total Repayment",
-                    "Processing Fee",
-                    "Collateral Required"
-                ],
-                "Value": [
-                    f"AED {recommended_amount:,.0f}",
-                    f"{interest_rate}%",
-                    f"{tenure_months} months",
-                    f"AED {monthly_installment:,.0f}",
-                    f"AED {total_interest:,.0f}",
-                    f"AED {total_repayment:,.0f}",
-                    f"AED {processing_fee:,.0f} ({processing_fee_pct}%)",
-                    collateral
-                ]
-            })
-            st.dataframe(loan_details, use_container_width=True, hide_index=True)
-        
-        with col2:
-            # Debt-to-Income calculation
-            monthly_income = cust_data['avg_monthly_income']
-            existing_obligations = 3400  # From existing loans/cards
-            new_installment = monthly_installment
-            total_obligations = existing_obligations + new_installment
-            dti_ratio = (total_obligations / monthly_income) * 100
-            
-            st.markdown("**Debt-to-Income Analysis**")
-            dti_data = pd.DataFrame({
-                "Item": [
-                    "Monthly Income",
-                    "Existing Obligations",
-                    "New Loan Installment",
-                    "Total Obligations",
-                    "Debt-to-Income Ratio",
-                    "DTI Status"
-                ],
-                "Amount": [
-                    f"AED {monthly_income:,.0f}",
-                    f"AED {existing_obligations:,.0f}",
-                    f"AED {new_installment:,.0f}",
-                    f"AED {total_obligations:,.0f}",
-                    f"{dti_ratio:.1f}%",
-                    "✅ Healthy" if dti_ratio < 40 else "⚠️ High"
-                ]
-            })
-            st.dataframe(dti_data, use_container_width=True, hide_index=True)
-            
-            if dti_ratio < 40:
-                st.success(f"✅ DTI ratio of {dti_ratio:.1f}% is within acceptable limits (<40%)")
-            else:
-                st.warning(f"⚠️ DTI ratio of {dti_ratio:.1f}% exceeds recommended limit")
-    else:
-        # No loan offered - display rejection message
-        st.error(f"""
-        ### ❌ {loan_status}
-        
-        **Reason:** {loan_message}
-        
-        **Risk Assessment:**
-        - Kee Score: {kee_score:.6f} ({risk_category})
-        - Risk Level: Too high for loan approval
-        
-        **Recommendations:**
-        - Build credit history with smaller transactions
-        - Improve business stability and reduce volatility
-        - Reapply after 6-12 months with improved metrics
-        - Consider alternative financing options
-        - Provide additional collateral or guarantor
-        
-        **Alternative Options:**
-        - Trade credit with shorter payment terms
-        - Secured financing with substantial collateral
-        - Co-signer with strong credit profile
-        - Business improvement program enrollment
-        """)
-
-    
-    # Final Recommendation
-    st.markdown("---")
-    st.markdown("### 🎯 Credit Decision Recommendation")
-    
-    # Dynamic decision based on Kee Score and DTI
-    kee_score = cust_data['kee_score']
-    
-    # Calculate DTI ratio for decision logic
-    monthly_income = cust_data['avg_monthly_income']
-    existing_obligations = 3400  # From existing loans/cards
-    # Estimate potential new installment for DTI calculation
-    estimated_loan = min(int(cust_data['gmv'] * 0.3), 50000)
-    estimated_installment = (estimated_loan * 1.075 * 0.5) / 6  # Rough estimate
-    total_obligations = existing_obligations + estimated_installment
-    dti_ratio = (total_obligations / monthly_income) * 100
-    
-    # Decision logic
-    if kee_score < 0.05 and dti_ratio < 40:
-        decision = "APPROVE"
-        decision_color = "success"
-        decision_icon = "✅"
-        interest_rate = 7.5
-        collateral = "Not required"
-    elif kee_score < 0.1 and dti_ratio < 45:
-        decision = "APPROVE WITH CONDITIONS"
-        decision_color = "warning"
-        decision_icon = "⚠️"
-        interest_rate = 9.5
-        collateral = "Recommended"
-    elif kee_score < 0.5 and dti_ratio < 50:
-        decision = "CONDITIONAL APPROVAL"
-        decision_color = "warning"
-        decision_icon = "⚠️"
-        interest_rate = 12.5
-        collateral = "Required"
-    else:
-        decision = "REJECT"
-        decision_color = "error"
-        decision_icon = "❌"
-        interest_rate = None
-        collateral = "N/A"
-    
-    # Build rationale based on actual data
-    rationale_items = []
-    
-    # Kee Score assessment
-    if kee_score < 0.05:
-        rationale_items.append(f"✅ Very Low Kee Score ({kee_score:.6f} probability of default)")
-    elif kee_score < 0.1:
-        rationale_items.append(f"⚠️ Low Kee Score ({kee_score:.6f} probability of default)")
-    elif kee_score < 0.5:
-        rationale_items.append(f"⚠️ Medium Kee Score ({kee_score:.6f} probability of default)")
-    else:
-        rationale_items.append(f"❌ High Kee Score ({kee_score:.6f} probability of default)")
-    
-    # DTI assessment
-    if dti_ratio < 40:
-        rationale_items.append(f"✅ Healthy debt-to-income ratio ({dti_ratio:.1f}%)")
-    elif dti_ratio < 50:
-        rationale_items.append(f"⚠️ Elevated debt-to-income ratio ({dti_ratio:.1f}%)")
-    else:
-        rationale_items.append(f"❌ High debt-to-income ratio ({dti_ratio:.1f}%)")
-    
-    # Credit score assessment
-    if cust_data['aecb_score'] >= 750:
-        rationale_items.append(f"✅ Excellent credit score ({cust_data['aecb_score']})")
-    elif cust_data['aecb_score'] >= 700:
-        rationale_items.append(f"✅ Good credit score ({cust_data['aecb_score']})")
-    elif cust_data['aecb_score'] >= 650:
-        rationale_items.append(f"⚠️ Fair credit score ({cust_data['aecb_score']})")
-    else:
-        rationale_items.append(f"❌ Poor credit score ({cust_data['aecb_score']})")
-    
-    # GMV and business performance
-    if cust_data['gmv'] > 100000:
-        rationale_items.append(f"✅ Strong business performance (AED {cust_data['gmv']:,.2f} GMV)")
-    elif cust_data['gmv'] > 50000:
-        rationale_items.append(f"✅ Moderate business performance (AED {cust_data['gmv']:,.2f} GMV)")
-    else:
-        rationale_items.append(f"⚠️ Limited business history (AED {cust_data['gmv']:,.2f} GMV)")
-    
-    # Active months
-    if cust_data['active_months'] >= 12:
-        rationale_items.append(f"✅ Long tenure ({cust_data['active_months']} months)")
-    elif cust_data['active_months'] >= 6:
-        rationale_items.append(f"✅ Established customer ({cust_data['active_months']} months)")
-    else:
-        rationale_items.append(f"⚠️ New customer ({cust_data['active_months']} months)")
-    
-    # Income stability
-    rationale_items.append("✅ Stable income and employment")
-    rationale_items.append("✅ 100% on-time utility bill payments")
-    rationale_items.append("✅ All KYC documents verified")
-    
-    # Display decision box
-    rationale_text = "\n".join([f"    - {item}" for item in rationale_items])
-    
-    if decision == "APPROVE":
-        st.success(f"""
-    ### {decision_icon} RECOMMENDED: {decision}
-    
-    **Rationale:**
-{rationale_text}
-    
-    **Suggested Terms:**
-    - **Loan Amount:** AED {recommended_amount:,.0f}
-    - **Interest Rate:** {interest_rate}% per annum (preferential rate)
-    - **Tenure:** 6 months
-    - **Monthly Installment:** AED {(recommended_amount * (1 + interest_rate/100 * 0.5) / 6):,.0f}
-    - **Collateral:** {collateral}
-    - **Processing Fee:** AED {(recommended_amount * 0.01):,.0f} (1%)
-    
-    **Conditions:**
-    - Maintain current employment
-    - No additional credit inquiries during loan tenure
-    - Auto-debit setup for repayments
-    """)
-    elif decision in ["APPROVE WITH CONDITIONS", "CONDITIONAL APPROVAL"]:
-        st.warning(f"""
-    ### {decision_icon} RECOMMENDED: {decision}
-    
-    **Rationale:**
-{rationale_text}
-    
-    **Suggested Terms:**
-    - **Loan Amount:** AED {recommended_amount:,.0f}
-    - **Interest Rate:** {interest_rate}% per annum (higher risk premium)
-    - **Tenure:** 6 months
-    - **Monthly Installment:** AED {(recommended_amount * (1 + interest_rate/100 * 0.5) / 6):,.0f}
-    - **Collateral:** {collateral}
-    - **Processing Fee:** AED {(recommended_amount * 0.015):,.0f} (1.5%)
-    
-    **Additional Conditions:**
-    - Provide additional collateral or guarantor
-    - Reduce loan amount by 30-50%
-    - Shorter tenure (3-4 months)
-    - Weekly payment monitoring
-    - Mandatory financial counseling
-    """)
-    else:
-        st.error(f"""
-    ### {decision_icon} RECOMMENDED: {decision}
-    
-    **Rationale:**
-{rationale_text}
-    
-    **Reasons for Rejection:**
-    - Risk score exceeds acceptable threshold
-    - Insufficient creditworthiness indicators
-    - High probability of default
-    
-    **Alternative Options:**
-    - Reapply after 6 months with improved metrics
-    - Consider secured loan with substantial collateral
-    - Build credit history with smaller transactions
-    - Provide co-signer with strong credit profile
-    """)
-    
-    # Action Buttons
-    st.markdown("---")
-    st.markdown("### 🎬 Take Action")
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        if st.button("✅ Approve Loan", type="primary", use_container_width=True):
-            st.session_state['decision'] = 'approved'
-            st.balloons()
-            st.success("✅ Loan Approved! Notification sent to customer.")
-            st.info(f"""
-            **Approval Details:**
-            - Customer: {selected_customer.split(' - ')[1]}
-            - Amount: AED {recommended_amount:,.0f}
-            - Rate: 7.5%
-            - Approved by: Credit Officer
-            - Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            """)
-    
-    with col2:
-        if st.button("❌ Reject Loan", use_container_width=True):
-            st.session_state['decision'] = 'rejected'
-            
-            # Rejection reason selector
-            rejection_reason = st.selectbox(
-                "Select Rejection Reason",
-                [
-                    "Insufficient income",
-                    "High debt-to-income ratio",
-                    "Poor credit history",
-                    "Incomplete documentation",
-                    "Employment concerns",
-                    "Other"
-                ]
-            )
-            
-            rejection_notes = st.text_area("Additional Notes", placeholder="Enter reason for rejection...")
-            
-            if st.button("Confirm Rejection"):
-                st.error(f"❌ Loan Rejected. Reason: {rejection_reason}")
-                st.info(f"""
-                **Rejection Details:**
-                - Customer: {selected_customer.split(' - ')[1]}
-                - Reason: {rejection_reason}
-                - Notes: {rejection_notes}
-                - Rejected by: Credit Officer
-                - Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-                """)
-    
-    with col3:
-        if st.button("📋 Request More Info", use_container_width=True):
-            st.warning("📋 Information Request Sent")
-            
-            required_docs = st.multiselect(
-                "Select Required Documents",
-                [
-                    "Updated bank statements",
-                    "Recent salary certificate",
-                    "Additional references",
-                    "Property documents",
-                    "Business license",
-                    "Tax returns"
-                ]
-            )
-            
-            additional_info = st.text_area("Specify Additional Information Needed")
-            
-            if st.button("Send Request"):
-                st.info(f"""
-                **Information Request Sent:**
-                - Customer: {selected_customer.split(' - ')[1]}
-                - Documents: {', '.join(required_docs)}
-                - Additional Info: {additional_info}
-                - Deadline: {(datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')}
-                """)
-    
-    with col4:
-        if st.button("💾 Save for Later", use_container_width=True):
-            st.info("💾 Application saved to pending queue")
-            st.success(f"""
-            **Saved Successfully:**
-            - Customer: {selected_customer.split(' - ')[1]}
-            - Status: Pending Review
-            - Saved by: Credit Officer
-            - Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            - Reminder: Set for tomorrow
-            """)
-
-    
-    # Recent Decisions History
-    st.markdown("---")
-    st.markdown("### 📋 Recent Credit Decisions")
-    
-    decisions_data = pd.DataFrame({
-        "Date": [
-            "2025-06-06 14:30",
-            "2025-06-06 13:15",
-            "2025-06-05 16:45",
-            "2025-06-05 11:20",
-            "2025-06-04 15:10"
-        ],
-        "Customer ID": ["8697", "5432", "9876", "3456", "7890"],
-        "Customer Name": [
-            "Khalid Al Shamsi",
-            "Mariam Al Blooshi",
-            "Omar Al Suwaidi",
-            "Noura Al Dhaheri",
-            "Hassan Al Kaabi"
-        ],
-        "Requested": ["AED 50,000", "AED 30,000", "AED 100,000", "AED 25,000", "AED 75,000"],
-        "Approved": ["AED 50,000", "AED 30,000", "Rejected", "AED 25,000", "AED 60,000"],
-        "Decision": ["✅ Approved", "✅ Approved", "❌ Rejected", "✅ Approved", "✅ Approved"],
-        "Officer": ["You", "You", "You", "Sarah M.", "Ahmed K."],
-        "Kee Score": ["0.000123", "0.002", "0.085", "0.001", "0.003"]
-    })
-    
-    st.dataframe(decisions_data, use_container_width=True, hide_index=True)
-    
-    # Statistics
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Today's Approvals", "15", "+3")
-    with col2:
-        st.metric("Today's Rejections", "3", "-1")
-    with col3:
-        st.metric("Approval Rate", "83.3%", "+5%")
-    with col4:
-        st.metric("Avg Decision Time", "12 min", "-2 min")
 
 
 # Main execution
