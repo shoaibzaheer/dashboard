@@ -297,7 +297,7 @@ def render_credit_officer_dashboard():
         # For low-risk customers, features should decrease risk (negative SHAP)
         
         # Base SHAP calculation - adjust based on feature quality
-        base_impact = kee_score / 8  # Distribute the score across features
+        base_impact = kee_score_scaled / 8  # Distribute the score across features
         
         # Volatility impact (high volatility = increases risk)
         if volatility_val > 0.5:
