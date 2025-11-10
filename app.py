@@ -1825,7 +1825,6 @@ elif stage == "📈 6. Dashboards":
         [
             "🎯 Executive Dashboard",
             "🔬 Technical Dashboard",
-            "📊 Customer Risk Dashboard",
             "💼 Credit Officer Dashboard"
         ]
     )
