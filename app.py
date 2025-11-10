@@ -742,7 +742,7 @@ elif stage == "📥 1. Data Ingestion":
     # Detailed data source information
     st.markdown("#### 📋 Data Source Details")
     
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🏢 Distribution Partner Data", "💳 Payment Partner RSPI", "🏦 Bank Transactions", "📊 AECB Data", "🏢 LOS Data", "⚡ Dewa Bills"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🏢 Distribution Partner Data", "💳 Payment Partner", "🏦 Bank Transactions", "📊 AECB Data", "🏢 LOS Data", "⚡ Dewa Bills"])
     
     with tab1:
         st.markdown("**Distribution Partner Transactional Data**")
@@ -1132,7 +1132,7 @@ elif stage == "🔧 3. Feature Engineering":
             "total_orders", "total_gmv", "monthly_gmv", "sales_3m",
             "sales_6m", "sales_12m", "mom_growth_3m", "top3_sku_share",
             
-            # Payment Partner (RSPI) Features (10)
+            # Payment Partner Features (10)
             "rspi_risk_score", "payment_velocity", "transaction_frequency", "avg_transaction_amount",
             "payment_consistency", "fraud_indicator_score", "spending_trend_3m", "credit_utilization_ratio",
             "payment_method_diversity", "cross_border_txn_ratio",
