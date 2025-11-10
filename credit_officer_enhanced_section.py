@@ -88,7 +88,7 @@ def render_credit_officer_dashboard():
     # Create tabs for different data sources
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📊 Distribution Partner Data",
-        "🎯 Risk Profile",
+        "🎯 Kee Profile",
         "🏦 Bank Statements",
         "📈 AECB Score",
         "⚡ DEWA Bills",
@@ -162,9 +162,9 @@ def render_credit_officer_dashboard():
             st.plotly_chart(fig, use_container_width=True)
 
     
-    # TAB 2: Risk Profile with SHAP Analysis
+    # TAB 2: Kee Profile with SHAP Analysis
     with tab2:
-        st.markdown("#### 🎯 Customer Risk Profile & SHAP Analysis")
+        st.markdown("#### 🎯 Customer Kee Profile & SHAP Analysis")
         st.markdown("*ML model risk assessment with detailed feature explanations*")
         
         # Kee score display
@@ -311,7 +311,7 @@ def render_credit_officer_dashboard():
         fig = px.pie(expense_categories, values="Amount", names="Category",
                      title="Monthly Expense Distribution",
                      color_discrete_sequence=px.colors.sequential.RdBu)
-        fig.update_layout(height=300)
+        fig.update_layout(height=500)
         st.plotly_chart(fig, use_container_width=True)
 
     
@@ -591,26 +591,30 @@ def render_credit_officer_dashboard():
     
     # Loan Recommendations Section
     st.markdown("---")
-    st.markdown("### 💡 AI-Powered Loan Recommendations")
+    st.markdown("### 💡 Kee Loan Recommendations")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("**Recommended Loan Amount**")
-        recommended_amount = min(requested_limit * 1.5, 75000)
+        # Recommended amount should not exceed requested limit
+        recommended_amount = min(requested_limit, 75000)
         st.markdown(f"<h2 style='color: green;'>AED {recommended_amount:,.0f}</h2>", unsafe_allow_html=True)
-        if recommended_amount > requested_limit:
-            st.success(f"✅ Customer qualifies for AED {recommended_amount - requested_limit:,.0f} more than requested!")
+        if recommended_amount == requested_limit:
+            st.success(f"✅ Full requested amount approved")
+        else:
+            st.warning(f"⚠️ Approved amount is capped at AED {recommended_amount:,.0f}")
     
     with col2:
         st.markdown("**Suggested Interest Rate**")
         st.markdown("<h2 style='color: #1f77b4;'>7.5%</h2>", unsafe_allow_html=True)
-        st.info("Preferential rate based on risk profile")
+        st.info("Preferential rate based on Kee Profile")
     
     with col3:
         st.markdown("**Optimal Tenure**")
-        st.markdown("<h2 style='color: #ff7f0e;'>24 months</h2>", unsafe_allow_html=True)
-        st.info("Balanced repayment schedule")
+        # Optimal tenure should not exceed 6 months
+        st.markdown("<h2 style='color: #ff7f0e;'>6 months</h2>", unsafe_allow_html=True)
+        st.info("Short-term repayment schedule")
     
     # Loan calculation details
     st.markdown("---")
@@ -633,10 +637,10 @@ def render_credit_officer_dashboard():
             "Value": [
                 f"AED {recommended_amount:,.0f}",
                 "7.5%",
-                "24 months",
-                f"AED {(recommended_amount * 1.09 / 24):,.0f}",
-                f"AED {(recommended_amount * 0.09):,.0f}",
-                f"AED {(recommended_amount * 1.09):,.0f}",
+                "6 months",
+                f"AED {(recommended_amount * 1.0225 / 6):,.0f}",
+                f"AED {(recommended_amount * 0.0225):,.0f}",
+                f"AED {(recommended_amount * 1.0225):,.0f}",
                 f"AED {(recommended_amount * 0.01):,.0f}",
                 "Not Required"
             ]
@@ -698,12 +702,12 @@ def render_credit_officer_dashboard():
     - ✅ All KYC documents verified
     
     **Suggested Terms:**
-    - **Loan Amount:** AED 75,000 (50% higher than requested)
+    - **Loan Amount:** AED 50,000 (as requested)
     - **Interest Rate:** 7.5% per annum (preferential rate)
-    - **Tenure:** 24 months
-    - **Monthly Installment:** AED 3,406
+    - **Tenure:** 6 months
+    - **Monthly Installment:** AED 8,521
     - **Collateral:** Not required
-    - **Processing Fee:** AED 750 (1%)
+    - **Processing Fee:** AED 500 (1%)
     
     **Conditions:**
     - Maintain current employment
@@ -822,7 +826,7 @@ def render_credit_officer_dashboard():
             "Hassan Al Kaabi"
         ],
         "Requested": ["AED 50,000", "AED 30,000", "AED 100,000", "AED 25,000", "AED 75,000"],
-        "Approved": ["AED 75,000", "AED 30,000", "Rejected", "AED 25,000", "AED 60,000"],
+        "Approved": ["AED 50,000", "AED 30,000", "Rejected", "AED 25,000", "AED 60,000"],
         "Decision": ["✅ Approved", "✅ Approved", "❌ Rejected", "✅ Approved", "✅ Approved"],
         "Officer": ["You", "You", "You", "Sarah M.", "Ahmed K."],
         "Kee Score": ["0.000123", "0.002", "0.085", "0.001", "0.003"]
