@@ -95,24 +95,26 @@ def render_credit_officer_dashboard():
                     except:
                         pass  # File might be too large or corrupted
             
-            # If conektr data is available, merge it
-            if conektr_df is not None:
-                # Get unique customers with their outlet names
-                customer_names = conektr_df.groupby('customer_id')['Outlet Name'].first().reset_index()
+            # Use dashboard data as base
+            merged_df = dashboard_df.copy()
+            
+            # Check if customer_name column exists, otherwise create it
+            if 'customer_name' in merged_df.columns:
+                # Rename to Outlet Name for consistency
+                merged_df['Outlet Name'] = merged_df['customer_name']
+            elif 'Outlet Name' not in merged_df.columns:
+                # If conektr data is available, try to get outlet names from it
+                if conektr_df is not None:
+                    try:
+                        customer_names = conektr_df.groupby('customer_id')['Outlet Name'].first().reset_index()
+                        merged_df = merged_df.merge(customer_names, on='customer_id', how='left')
+                    except:
+                        pass
                 
-                # Merge with dashboard data
-                merged_df = dashboard_df.merge(customer_names, on='customer_id', how='left')
-                
-                # Remove customers with missing outlet names
-                merged_df = merged_df[merged_df['Outlet Name'].notna()]
-            else:
-                # Use dashboard data only and create synthetic outlet names
-                merged_df = dashboard_df.copy()
-                if 'Outlet Name' not in merged_df.columns:
-                    # Create outlet names from customer IDs
-                    merged_df['Outlet Name'] = merged_df['customer_id'].apply(
-                        lambda x: f"Customer {x}"
-                    )
+
+            
+            # Remove customers with missing outlet names
+            merged_df = merged_df[merged_df['Outlet Name'].notna()]
             
             return merged_df
         except Exception as e:
